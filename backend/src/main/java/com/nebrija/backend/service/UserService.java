@@ -50,26 +50,21 @@ public class UserService {
         return future.get();
     }
 
-    // Modify createUser in UserService.java
     public void createUser(String email, String password, String nombreUsuario, String nombreCompleto,
-                           String telefono, String direccion, double peso, double altura, String sexo) {
+                           String telefono, String direccion, double peso, double altura, String sexo, int edad, String objetivo) {
         try {
             UserRecord userRecord;
 
-            // Try to get existing user first
             try {
                 userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
             } catch (FirebaseAuthException e) {
-                // User doesn't exist yet, create them
                 UserRecord.CreateRequest request = new UserRecord.CreateRequest()
                         .setEmail(email)
                         .setPassword(password)
                         .setDisplayName(nombreCompleto);
-
                 userRecord = FirebaseAuth.getInstance().createUser(request);
             }
 
-            // Create a User object for Realtime Database
             User user = new User();
             user.setId_usuario(userRecord.getUid());
             user.setNombreUsuario(nombreUsuario);
@@ -77,30 +72,27 @@ public class UserService {
             user.setTelefono(telefono);
             user.setDireccion(direccion);
             user.setEmail(email);
-            user.setPassword(password); // Note: Consider not storing plaintext passwords
+            user.setPassword(password);
             user.setPeso(peso);
             user.setAltura(altura);
             user.setSexo(sexo);
-            user.setRol(Role.USER); // Set default role
+            user.setEdad(edad);
+            user.setObjetivo(objetivo);
+            user.setRol(Role.USER);
 
-            // Save the user in Firebase Realtime Database
             service.saveUserToRealtimeDatabase(user);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     // Metodo para actualizar un usuario en Firebase Auth y en Realtime Database
-    public void updateUser(String uid, String nombreUsuario, String nombreCompleto, String telefono, String direccion, double peso, double altura, String sexo) {
+    public void updateUser(String uid, String nombreUsuario, String nombreCompleto, String telefono, String direccion, double peso, double altura, String sexo, int edad, String objetivo) {
         try {
-            // 1. Actualizar los datos en Firebase Authentication (si es necesario)
             UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
                     .setDisplayName(nombreCompleto);
+            FirebaseAuth.getInstance().updateUser(request);
 
-            UserRecord userRecord = FirebaseAuth.getInstance().updateUser(request);
-
-            // 2. Crear un objeto User con los nuevos datos
             User user = new User();
             user.setId_usuario(uid);
             user.setNombreUsuario(nombreUsuario);
@@ -109,11 +101,11 @@ public class UserService {
             user.setDireccion(direccion);
             user.setPeso(peso);
             user.setAltura(altura);
+            user.setEdad(edad);
             user.setSexo(sexo);
+            user.setObjetivo(objetivo);
 
-            // 3. Actualizar los datos en Firebase Realtime Database
             service.updateUserInRealtimeDatabase(user);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

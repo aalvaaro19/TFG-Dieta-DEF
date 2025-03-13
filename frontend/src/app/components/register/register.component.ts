@@ -17,7 +17,6 @@ export class RegisterComponent {
   user = {
     nombreUsuario: '',
     nombreCompleto: '',
-    edad: 0,
     telefono: '',
     direccion: '',
     email: '',
@@ -25,6 +24,7 @@ export class RegisterComponent {
     peso: 0,
     altura: 0,
     sexo: '',
+    edad: 0,
     objetivo: ''
   }
 
@@ -43,12 +43,12 @@ export class RegisterComponent {
         password: this.user.password,
         nombreUsuario: this.user.nombreUsuario,
         nombreCompleto: this.user.nombreCompleto,
-        edad: this.user.edad,
         telefono: this.user.telefono,
         direccion: this.user.direccion,
         peso: this.user.peso,
         altura: this.user.altura,
         sexo: this.user.sexo,
+        edad: this.user.edad,
         objetivo: this.user.objetivo
       };
   

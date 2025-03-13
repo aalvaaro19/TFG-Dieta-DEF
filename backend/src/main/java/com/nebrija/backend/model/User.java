@@ -1,6 +1,5 @@
 package com.nebrija.backend.model;
 
-
 import com.nebrija.backend.model.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +22,8 @@ public class User {
     private double peso;
     private double altura;
     private String sexo;
+    private int edad;
+    private String objetivo;
     private Role rol = Role.USER;
 
     public Map<String, Object> toMap() {
@@ -37,6 +38,8 @@ public class User {
         map.put("peso", peso);
         map.put("altura", altura);
         map.put("sexo", sexo);
+        map.put("edad", edad);
+        map.put("objetivo", objetivo);
         map.put("rol", rol != null ? rol.name() : Role.USER.name());
         return map;
     }
@@ -51,7 +54,6 @@ public class User {
         user.setEmail((String) map.get("email"));
         user.setPassword((String) map.get("password"));
 
-        // Handle numeric values that might be stored as different types in Firebase
         if (map.get("peso") instanceof Double) {
             user.setPeso((Double) map.get("peso"));
         } else if (map.get("peso") instanceof Long) {
@@ -66,23 +68,24 @@ public class User {
 
         user.setSexo((String) map.get("sexo"));
 
-        // Set role - handle both string and enum cases
+        if (map.get("edad") instanceof Integer) {
+            user.setEdad((Integer) map.get("edad"));
+        } else if (map.get("edad") instanceof Long) {
+            user.setEdad(((Long) map.get("edad")).intValue());
+        }
+
+        user.setObjetivo((String) map.get("objetivo"));
+
         try {
             if (map.get("rol") != null) {
-                String roleStr = map.get("rol").toString();
-                user.setRol(Role.valueOf(roleStr));
+                user.setRol(Role.valueOf(map.get("rol").toString()));
             } else {
-                user.setRol(Role.USER); // Default role
+                user.setRol(Role.USER);
             }
         } catch (IllegalArgumentException e) {
-            // Default to USER if role parsing fails
             user.setRol(Role.USER);
         }
 
         return user;
     }
-
-    public Role getRol() {
-        return rol != null ? rol : Role.USER;
-    }
-}// End of class User
+}//Cierre de la clase User

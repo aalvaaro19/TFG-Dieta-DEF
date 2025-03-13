@@ -74,13 +74,13 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                     double peso = 0.0;
                     double altura = 0.0;
                     String sexo = "";
+                    int edad = 0;
+                    String objetivo = "";
 
-                    userService.createUser(email, password, nombreUsuario, nombreCompleto, telefono, direccion, peso, altura, sexo);
+                    userService.createUser(email, password, nombreUsuario, nombreCompleto, telefono, direccion, peso, altura, sexo, edad, objetivo);
 
-                    // Get the newly created user
                     user = userService.findUserByUid(decodedToken.getUid());
 
-                    // If still null, something is wrong
                     if (user == null) {
                         throw new IllegalStateException("Unable to create or retrieve user");
                     }
