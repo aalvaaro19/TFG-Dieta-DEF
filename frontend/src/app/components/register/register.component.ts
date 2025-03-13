@@ -25,7 +25,8 @@ export class RegisterComponent {
     altura: 0,
     sexo: '',
     edad: 0,
-    objetivo: ''
+    objetivo: '',
+    imagen: ''
   }
 
   constructor(private authService: AuthService, private router: Router, private http: HttpClient) { }
@@ -49,7 +50,8 @@ export class RegisterComponent {
         altura: this.user.altura,
         sexo: this.user.sexo,
         edad: this.user.edad,
-        objetivo: this.user.objetivo
+        objetivo: this.user.objetivo, 
+        imagen: this.user.imagen
       };
   
       this.http.post('http://localhost:8080/api/users/createUser', newUser)

@@ -76,8 +76,9 @@ public class FirebaseAuthenticationFilter extends OncePerRequestFilter {
                     String sexo = "";
                     int edad = 0;
                     String objetivo = "";
+                    String imagen = "";
 
-                    userService.createUser(email, password, nombreUsuario, nombreCompleto, telefono, direccion, peso, altura, sexo, edad, objetivo);
+                    userService.createUser(email, password, nombreUsuario, nombreCompleto, telefono, direccion, peso, altura, sexo, edad, objetivo, imagen);
 
                     user = userService.findUserByUid(decodedToken.getUid());
 

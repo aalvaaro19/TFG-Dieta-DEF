@@ -51,7 +51,7 @@ public class UserService {
     }
 
     public void createUser(String email, String password, String nombreUsuario, String nombreCompleto,
-                           String telefono, String direccion, double peso, double altura, String sexo, int edad, String objetivo) {
+                           String telefono, String direccion, double peso, double altura, String sexo, int edad, String objetivo, String imagen) {
         try {
             UserRecord userRecord;
 
@@ -78,6 +78,7 @@ public class UserService {
             user.setSexo(sexo);
             user.setEdad(edad);
             user.setObjetivo(objetivo);
+            user.setImagen(imagen);
             user.setRol(Role.USER);
 
             service.saveUserToRealtimeDatabase(user);
@@ -87,7 +88,7 @@ public class UserService {
     }
 
     // Metodo para actualizar un usuario en Firebase Auth y en Realtime Database
-    public void updateUser(String uid, String nombreUsuario, String nombreCompleto, String telefono, String direccion, double peso, double altura, String sexo, int edad, String objetivo) {
+    public void updateUser(String uid, String nombreUsuario, String nombreCompleto, String telefono, String direccion, double peso, double altura, String sexo, int edad, String objetivo, String imagen) {
         try {
             UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
                     .setDisplayName(nombreCompleto);
@@ -104,6 +105,7 @@ public class UserService {
             user.setEdad(edad);
             user.setSexo(sexo);
             user.setObjetivo(objetivo);
+            user.setImagen(imagen);
 
             service.updateUserInRealtimeDatabase(user);
         } catch (Exception e) {

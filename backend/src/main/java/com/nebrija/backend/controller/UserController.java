@@ -42,7 +42,7 @@ public class UserController {
     public void createUser(@RequestBody User user) {
         userService.createUser(user.getEmail(), user.getPassword(), user.getNombreUsuario(),
                 user.getNombreCompleto(), user.getTelefono(), user.getDireccion(),
-                user.getPeso(), user.getAltura(), user.getSexo(), user.getEdad(), user.getObjetivo());
+                user.getPeso(), user.getAltura(), user.getSexo(), user.getEdad(), user.getObjetivo(), user.getImagen());
     }
 
     @PutMapping("/users/update/{uid}")
@@ -55,8 +55,9 @@ public class UserController {
                            @RequestParam double altura,
                            @RequestParam String sexo,
                            @RequestParam int edad,
-                           @RequestParam String objetivo){
-        userService.updateUser(uid, nombreUsuario, nombreCompleto, telefono, direccion, peso, altura, sexo, edad, objetivo);
+                           @RequestParam String objetivo,
+                           @RequestParam String imagen) {
+        userService.updateUser(uid, nombreUsuario, nombreCompleto, telefono, direccion, peso, altura, sexo, edad, objetivo, imagen);
     }
 
     @DeleteMapping("/users/delete/{uid}")

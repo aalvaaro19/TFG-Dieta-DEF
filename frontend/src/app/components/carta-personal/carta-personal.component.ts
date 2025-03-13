@@ -72,4 +72,9 @@ export class CartaPersonalComponent implements OnInit {
       this.router.navigate(['/login']);
     }
   }
+
+  updateUser(){
+    console.log('Actualizando usuario:', this.usuario);
+    this.router.navigate(['/editar-usuario']);
+  }
 }

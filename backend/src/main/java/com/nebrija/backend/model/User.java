@@ -24,6 +24,7 @@ public class User {
     private String sexo;
     private int edad;
     private String objetivo;
+    private String imagen;
     private Role rol = Role.USER;
 
     public Map<String, Object> toMap() {
@@ -40,6 +41,7 @@ public class User {
         map.put("sexo", sexo);
         map.put("edad", edad);
         map.put("objetivo", objetivo);
+        map.put("imagen", imagen);
         map.put("rol", rol != null ? rol.name() : Role.USER.name());
         return map;
     }
@@ -75,6 +77,7 @@ public class User {
         }
 
         user.setObjetivo((String) map.get("objetivo"));
+        user.setImagen((String) map.get("imagen"));
 
         try {
             if (map.get("rol") != null) {
