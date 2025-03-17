@@ -73,8 +73,31 @@ export class CartaPersonalComponent implements OnInit {
     }
   }
 
-  updateUser(){
-    console.log('Actualizando usuario:', this.usuario);
-    this.router.navigate(['/editar-usuario']);
+  updateUser(usuarioSeleccionado: any) {
+    if (usuarioSeleccionado?.id_usuario) {
+      console.log('Actualizando usuario:', usuarioSeleccionado);
+      this.router.navigate(['/editar-usuario/', usuarioSeleccionado.id_usuario]);
+    } else {
+      console.error('Usuario no definido o sin ID:', usuarioSeleccionado);
+    }
   }
+
+  async deleteUser(usuarioSeleccionado: any) {
+    if (usuarioSeleccionado?.id_usuario) {
+      console.log('Eliminando usuario:', usuarioSeleccionado);
+      const token = await this.usuario?.getIdToken();
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      try {
+        await firstValueFrom(this.http.delete(`http://localhost:8080/api/admin/users/delete/${usuarioSeleccionado.id_usuario}`, { headers }));
+        console.log('Usuario eliminado:', usuarioSeleccionado);
+        // Actualizar la lista de usuarios después de eliminar uno
+        this.users = this.users.filter(user => user.id_usuario !== usuarioSeleccionado.id_usuario);
+      } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+      }
+    } else {
+      console.error('Usuario no definido o sin ID:', usuarioSeleccionado);
+    }
+  }
+  
 }

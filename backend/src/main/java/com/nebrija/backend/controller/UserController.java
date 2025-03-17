@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class UserController {
 
     @PostMapping("/users/createUser")
     public void createUser(@RequestBody User user) {
+        System.out.println("Usuario recibido: " + user);
         userService.createUser(user.getEmail(), user.getPassword(), user.getNombreUsuario(),
                 user.getNombreCompleto(), user.getTelefono(), user.getDireccion(),
                 user.getPeso(), user.getAltura(), user.getSexo(), user.getEdad(), user.getObjetivo(), user.getImagen());
@@ -51,28 +53,20 @@ public class UserController {
                            @RequestParam String nombreCompleto,
                            @RequestParam String telefono,
                            @RequestParam String direccion,
+                           @RequestParam String email,
+                           @RequestParam String password,
                            @RequestParam double peso,
                            @RequestParam double altura,
                            @RequestParam String sexo,
                            @RequestParam int edad,
                            @RequestParam String objetivo,
                            @RequestParam String imagen) {
-        userService.updateUser(uid, nombreUsuario, nombreCompleto, telefono, direccion, peso, altura, sexo, edad, objetivo, imagen);
+        userService.updateUser(uid, nombreUsuario, nombreCompleto, telefono, direccion, email, password, peso, altura, sexo, edad, objetivo, imagen);
     }
 
     @DeleteMapping("/users/delete/{uid}")
-    public void deleteUser(@PathVariable String uid) {
-        userService.deleteUser(uid); // Llama al servicio para eliminar el usuario
-    }
-
-    @DeleteMapping("/users/deleteUser/{uid}")
-    public ResponseEntity<Void> deleteUsersss(@PathVariable String uid) {
-        try {
-            userService.deleteUser(uid);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+    public void deleteUser(@PathVariable String uid, @AuthenticationPrincipal String token) throws Exception {
+        userService.deleteUser(uid, token);
     }
 
     // Endpoints solo para administradores
@@ -82,6 +76,18 @@ public class UserController {
         try {
             List<User> users = userService.getAllUsers();
             return ResponseEntity.ok(users);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error(String.valueOf(e));
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/admin/users/getUserById")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> getUserById(@RequestParam String uid) {
+        try {
+            User user = userService.getUserById(uid);
+            return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
         } catch (ExecutionException | InterruptedException e) {
             log.error(String.valueOf(e));
             return ResponseEntity.internalServerError().build();
@@ -98,18 +104,6 @@ public class UserController {
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
-        }
-    }
-
-
-    @DeleteMapping("/admin/users/{uid}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteUsers(@PathVariable String uid) {
-        try {
-            userService.deleteUser(uid);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
         }
     }
 

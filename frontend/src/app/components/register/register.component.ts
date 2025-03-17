@@ -33,6 +33,7 @@ export class RegisterComponent {
 
   async registerWithEmailAndPassword() {
     try {
+      console.log('Datos capturados del formulario:', this.user);
       const userCredential = await this.authService.createUserWithEmailAndPassword(this.user.email, this.user.password);
       console.log('Usuario creado con éxito:', userCredential);
 
@@ -54,9 +55,16 @@ export class RegisterComponent {
         imagen: this.user.imagen
       };
   
+      console.log('Enviando usuario al backend:', newUser);
+
+      if (!this.user.email || !this.user.password || !this.user.nombreUsuario || !this.user.nombreCompleto || !this.user.telefono || !this.user.direccion || !this.user.peso || !this.user.altura || !this.user.sexo || !this.user.edad || !this.user.objetivo) {
+        console.error('Algunos campos obligatorios están vacíos.');
+        return;
+      }
+
       this.http.post('http://localhost:8080/api/users/createUser', newUser)
         .subscribe(response => {
-          console.log('Usuario guardado correctamente en Realtime Database', response);
+          console.log('Usuario guardado correctamente en Realtime Database', newUser);
           this.router.navigate(['/login']);
         }, error => {
           console.error('Error al guardar usuario en Realtime Database', error);

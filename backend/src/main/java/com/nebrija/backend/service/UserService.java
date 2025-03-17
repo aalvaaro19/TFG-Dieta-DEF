@@ -2,6 +2,7 @@ package com.nebrija.backend.service;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import com.google.firebase.database.*;
 import com.nebrija.backend.model.enums.Role;
@@ -9,6 +10,7 @@ import com.nebrija.backend.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +90,7 @@ public class UserService {
     }
 
     // Metodo para actualizar un usuario en Firebase Auth y en Realtime Database
-    public void updateUser(String uid, String nombreUsuario, String nombreCompleto, String telefono, String direccion, double peso, double altura, String sexo, int edad, String objetivo, String imagen) {
+    public void updateUser(String uid, String nombreUsuario, String nombreCompleto, String telefono, String direccion, String email, String password, double peso, double altura, String sexo, int edad, String objetivo, String imagen) {
         try {
             UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(uid)
                     .setDisplayName(nombreCompleto);
@@ -100,6 +102,8 @@ public class UserService {
             user.setNombreCompleto(nombreCompleto);
             user.setTelefono(telefono);
             user.setDireccion(direccion);
+            user.setEmail(email);
+            user.setPassword(password);
             user.setPeso(peso);
             user.setAltura(altura);
             user.setEdad(edad);
@@ -113,17 +117,52 @@ public class UserService {
         }
     }
 
-    // Metodo para eliminar un usuario tanto de Firebase Realtime Database como de Firebase Authentication
-    public void deleteUser(String uid) {
+    // Metodo para eliminar un usuario
+    public void deleteUser(String uid, String idToken) throws Exception {
         try {
-            // Primero, eliminar el usuario de Firebase Realtime Database
-            service.deleteUserFromRealtimeDatabase(uid);
+            // Verificar el token de ID para obtener el UID del usuario autenticado
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String authUid = decodedToken.getUid();
 
-            // Luego, eliminar el usuario de Firebase Authentication
-            service.deleteUserFromFirebaseAuth(uid);
+            // Obtener el rol del usuario autenticado desde la base de datos
+            String userRole = String.valueOf(verifyUserRole(authUid));  // Lógica para obtener el rol desde Firebase Database
 
+            // Si el usuario es ADMIN, puede eliminar a cualquier usuario
+            if ("ADMIN".equals(userRole)) {
+                deleteUserFromRealtimeDatabase(uid);  // Lógica para eliminar usuario de Firebase Realtime Database
+                deleteUserFromFirebaseAuth(uid);  // Lógica para eliminar usuario de Firebase Authentication
+            }
+
+            // Si el usuario es USER, solo puede eliminar su propio usuario
+            else if (authUid.equals(uid)) {
+                deleteUserFromRealtimeDatabase(uid);  // Eliminar su propio usuario
+                deleteUserFromFirebaseAuth(uid);  // Eliminar su propio usuario de Firebase Authentication
+            } else {
+                throw new Exception("No tienes permisos para eliminar este usuario.");
+            }
+
+        } catch (FirebaseAuthException e) {
+            throw new Exception("Error al verificar el token: " + e.getMessage());
+        }
+    }
+
+    // ✅ Metodo para eliminar usuario de Firebase Realtime Database
+    public void deleteUserFromRealtimeDatabase(String uid) throws Exception {
+        try {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(uid);
+            System.out.println("Usuario eliminado de Realtime Database: " + uid);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception("Error eliminando usuario de Firebase Database: " + e.getMessage());
+        }
+    }
+
+    // ✅ Metodo para eliminar usuario de Firebase Authentication
+    private void deleteUserFromFirebaseAuth(String uid) throws Exception {
+        try {
+            FirebaseAuth.getInstance().deleteUser(uid);
+            System.out.println("Usuario eliminado de Firebase Authentication: " + uid);
+        } catch (FirebaseAuthException e) {
+            throw new Exception("Error eliminando usuario de Firebase Auth: " + e.getMessage());
         }
     }
 
@@ -141,6 +180,31 @@ public class UserService {
                     userList.add(user);
                 }
                 future.complete(userList);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                future.completeExceptionally(databaseError.toException());
+            }
+        });
+
+        return future.get();
+    }
+
+    public User getUserById(String uid) throws ExecutionException, InterruptedException {
+        CompletableFuture<User> future = new CompletableFuture<>();
+
+        DatabaseReference ref = firebaseDatabase.getReference(USERS_PATH).child(uid);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    Map<String, Object> userData = (Map<String, Object>) dataSnapshot.getValue();
+                    User user = User.fromMap(userData);
+                    future.complete(user);
+                } else {
+                    future.complete(null);
+                }
             }
 
             @Override
