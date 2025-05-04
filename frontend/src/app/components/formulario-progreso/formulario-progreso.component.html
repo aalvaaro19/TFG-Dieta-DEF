@@ -1,0 +1,183 @@
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-8">
+  <h2 class="text-2xl font-bold text-center text-blue-800 mb-6">Registrar Nuevo Progreso Físico</h2>
+
+  <!-- Mensajes de alertas -->
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 relative">
+    <span class="block sm:inline">{{ error }}</span>
+  </div>
+
+  <div *ngIf="success" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 relative">
+    <span class="block sm:inline">{{ success }}</span>
+  </div>
+
+  <form [formGroup]="progresoForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Fecha -->
+    <div class="flex flex-col">
+      <label for="fecha" class="text-gray-700 font-semibold mb-1">Fecha de medición</label>
+      <input 
+        type="date" 
+        id="fecha" 
+        formControlName="fecha" 
+        class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+      <div *ngIf="progresoForm.get('fecha')?.invalid && progresoForm.get('fecha')?.touched" class="text-red-500 text-sm mt-1">
+        Fecha requerida
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Peso -->
+      <div class="flex flex-col">
+        <label for="peso" class="text-gray-700 font-semibold mb-1">Peso (kg)</label>
+        <input 
+          type="text" 
+          id="peso" 
+          formControlName="peso" 
+          placeholder="Ej: 75.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('peso')?.invalid && progresoForm.get('peso')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa un peso válido
+        </div>
+      </div>
+
+      <!-- Masa Grasa -->
+      <div class="flex flex-col">
+        <label for="masaGrasa" class="text-gray-700 font-semibold mb-1">Masa Grasa (%)</label>
+        <input 
+          type="text" 
+          id="masaGrasa" 
+          formControlName="masaGrasa" 
+          placeholder="Ej: 15.2" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('masaGrasa')?.invalid && progresoForm.get('masaGrasa')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa un porcentaje válido
+        </div>
+      </div>
+
+      <!-- Masa Muscular -->
+      <div class="flex flex-col">
+        <label for="masaMuscular" class="text-gray-700 font-semibold mb-1">Masa Muscular (%)</label>
+        <input 
+          type="text" 
+          id="masaMuscular" 
+          formControlName="masaMuscular" 
+          placeholder="Ej: 40.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('masaMuscular')?.invalid && progresoForm.get('masaMuscular')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa un porcentaje válido
+        </div>
+      </div>
+
+      <!-- Pecho -->
+      <div class="flex flex-col">
+        <label for="pecho" class="text-gray-700 font-semibold mb-1">Pecho (cm)</label>
+        <input 
+          type="text" 
+          id="pecho" 
+          formControlName="pecho" 
+          placeholder="Ej: 95.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('pecho')?.invalid && progresoForm.get('pecho')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa una medida válida
+        </div>
+      </div>
+
+      <!-- Cintura -->
+      <div class="flex flex-col">
+        <label for="cintura" class="text-gray-700 font-semibold mb-1">Cintura (cm)</label>
+        <input 
+          type="text" 
+          id="cintura" 
+          formControlName="cintura" 
+          placeholder="Ej: 82.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('cintura')?.invalid && progresoForm.get('cintura')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa una medida válida
+        </div>
+      </div>
+
+      <!-- Cadera -->
+      <div class="flex flex-col">
+        <label for="cadera" class="text-gray-700 font-semibold mb-1">Cadera (cm)</label>
+        <input 
+          type="text" 
+          id="cadera" 
+          formControlName="cadera" 
+          placeholder="Ej: 98.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('cadera')?.invalid && progresoForm.get('cadera')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa una medida válida
+        </div>
+      </div>
+
+      <!-- Abdomen -->
+      <div class="flex flex-col">
+        <label for="abdomen" class="text-gray-700 font-semibold mb-1">Abdomen (cm)</label>
+        <input 
+          type="text" 
+          id="abdomen" 
+          formControlName="abdomen" 
+          placeholder="Ej: 85.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('abdomen')?.invalid && progresoForm.get('abdomen')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa una medida válida
+        </div>
+      </div>
+
+      <!-- Brazo Derecho -->
+      <div class="flex flex-col">
+        <label for="brazoDerecho" class="text-gray-700 font-semibold mb-1">Brazo Derecho (cm)</label>
+        <input 
+          type="text" 
+          id="brazoDerecho" 
+          formControlName="brazoDerecho" 
+          placeholder="Ej: 32.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('brazoDerecho')?.invalid && progresoForm.get('brazoDerecho')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa una medida válida
+        </div>
+      </div>
+
+      <!-- Pierna Derecha -->
+      <div class="flex flex-col">
+        <label for="piernaDerecha" class="text-gray-700 font-semibold mb-1">Pierna Derecha (cm)</label>
+        <input 
+          type="text" 
+          id="piernaDerecha" 
+          formControlName="piernaDerecha" 
+          placeholder="Ej: 55.5" 
+          class="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <div *ngIf="progresoForm.get('piernaDerecha')?.invalid && progresoForm.get('piernaDerecha')?.touched" class="text-red-500 text-sm mt-1">
+          Ingresa una medida válida
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-center space-x-4 mt-8">
+      <button 
+        type="button" 
+        (click)="cancelar()" 
+        class="bg-gray-500 text-white py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-200"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="submit" 
+        [disabled]="progresoForm.invalid || loading" 
+        class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-blue-300"
+      >
+        <span *ngIf="!loading">Guardar Progreso</span>
+        <span *ngIf="loading">Guardando...</span>
+      </button>
+    </div>
+  </form>
+</div>

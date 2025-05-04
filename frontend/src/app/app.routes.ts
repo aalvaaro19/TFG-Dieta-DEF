@@ -7,6 +7,7 @@ import { EditarUsuariosComponent } from './components/editar-usuarios/editar-usu
 import { PaginaChatComponent } from './pages/pagina-chat/pagina-chat.component';
 import { PaginaChatIndividualComponent } from './pages/pagina-chat-individual/pagina-chat-individual.component';
 import { FormularioEditarRecetasComponent } from './components/formulario-editar-recetas/formulario-editar-recetas.component';
+import { FormularioProgresoComponent } from './components/formulario-progreso/formulario-progreso.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -18,4 +19,5 @@ export const routes: Routes = [
   { path: 'paginaChats',  component: PaginaChatComponent },
   { path: 'paginaChatIndividual', component: PaginaChatIndividualComponent},
   { path: 'recetas/editar/:id', component: FormularioEditarRecetasComponent },
+  { path: 'formularioProgreso', component: FormularioProgresoComponent },
 ];
