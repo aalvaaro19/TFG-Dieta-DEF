@@ -1,0 +1,31 @@
+<div class="flex flex-col h-screen">
+  <!-- Header -->
+  <div class="bg-blue-500 text-white p-4 flex items-center" *ngFor="let chat of allMessages; let i = index">
+    <!-- Mostrar el nombre del receptor para cada chat -->
+    <h1 class="text-xl font-bold">{{ chat.receiver.nombreUsuario }}</h1>
+  </div>
+
+  <!-- Chat Messages -->
+  <div class="overflow-y-auto p-4 space-y-4" *ngFor="let chat of allMessages">
+    <div *ngFor="let mensaje of chat.messages">
+      <!-- Message from user1 -->
+      <div *ngIf="mensaje.sender" class="flex justify-start">
+        <div class="bg-green-200 p-3 rounded-lg max-w-xs">
+          <p>{{mensaje.content}}</p>
+        </div>
+      </div>
+      <!-- Message from other users -->
+      <div *ngIf="mensaje.receiver" class="flex justify-end">
+        <div class="bg-blue-500 text-white p-3 rounded-lg max-w-xs">
+          <p>{{mensaje.content}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input for new message -->
+  <div class="bg-gray-100 p-4 flex items-center">
+    <input type="text" class="flex-1 p-2 border border-gray-300 rounded-lg" placeholder="Escribe tu mensaje...">
+    <button class="bg-blue-500 text-white p-2 rounded-lg ml-2" (click)="enviarMensaje()">Enviar</button>
+  </div>
+</div>

@@ -16,6 +16,7 @@ public class Receta {
     private String nombre;
     private String descripcion;
     private List<String> ingredientes;
+    private List<String> cantidades;
     private String calorias;
     private String cantidad_carbohidratos;
     private String cantidad_proteinas;
@@ -30,6 +31,7 @@ public class Receta {
         map.put("nombre", nombre);
         map.put("descripcion", descripcion);
         map.put("ingredientes", ingredientes);
+        map.put("cantidades", cantidades);
         map.put("calorias", calorias);
         map.put("cantidad_carbohidratos", cantidad_carbohidratos);
         map.put("cantidad_proteinas", cantidad_proteinas);
@@ -46,6 +48,7 @@ public class Receta {
         receta.setNombre((String) map.get("nombre"));
         receta.setDescripcion((String) map.get("descripcion"));
         receta.setIngredientes((List<String>) map.get("ingredientes"));
+        receta.setCantidades((List<String>) map.get("cantidades"));
         receta.setCalorias((String) map.get("calorias"));
         receta.setCantidad_carbohidratos((String) map.get("cantidad_carbohidratos"));
         receta.setCantidad_proteinas((String) map.get("cantidad_proteinas"));

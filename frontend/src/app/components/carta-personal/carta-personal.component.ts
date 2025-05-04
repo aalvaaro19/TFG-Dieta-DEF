@@ -5,6 +5,7 @@ import { User } from '@angular/fire/auth';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-carta-personal',
@@ -21,7 +22,8 @@ export class CartaPersonalComponent implements OnInit {
   constructor(
     private auth: Auth,  // Para verificar el estado de autenticación
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient, 
+    private authService: AuthService
   ) {}
 
   ngOnInit(){
@@ -85,15 +87,42 @@ export class CartaPersonalComponent implements OnInit {
   async deleteUser(usuarioSeleccionado: any) {
     if (usuarioSeleccionado?.id_usuario) {
       console.log('Eliminando usuario:', usuarioSeleccionado);
-      const token = await this.usuario?.getIdToken();
+      const token = await this.authService.getIdToken();
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
       try {
-        await firstValueFrom(this.http.delete(`http://localhost:8080/api/admin/users/delete/${usuarioSeleccionado.id_usuario}`, { headers }));
+        await firstValueFrom(this.http.delete(`http://localhost:8080/api/users/delete/${usuarioSeleccionado.id_usuario}`, { headers }));
         console.log('Usuario eliminado:', usuarioSeleccionado);
         // Actualizar la lista de usuarios después de eliminar uno
         this.users = this.users.filter(user => user.id_usuario !== usuarioSeleccionado.id_usuario);
       } catch (error) {
         console.error('Error al eliminar el usuario:', error);
+      }
+    } else {
+      console.error('Usuario no definido o sin ID:', usuarioSeleccionado);
+    }
+  }
+
+  async crearChat(usuarioSeleccionado: any) {
+    if (usuarioSeleccionado?.id_usuario) {
+      console.log('Creando chat con:', usuarioSeleccionado);
+      const token = await this.authService.getIdToken();
+      console.log('Usuario autenticado:', this.usuario?.email, 'Token:', token);
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      
+      const chatData = {
+        sender: this.usuario?.uid,  // El usuario actual
+        receiver: usuarioSeleccionado.id_usuario,  // El usuario seleccionado
+        mensajes: [],
+        read: false,
+        text: '¡Hola! ¿Cómo estás?',
+        timestamp: new Date().getTime()
+      };
+  
+      try {
+        const chat = await firstValueFrom(this.http.post<any>('http://localhost:8080/api/chat/crearChat', chatData, { headers }));
+        console.log('Chat creado:', chat, 'con:', usuarioSeleccionado, 'y usuario actual:', this.usuario);
+      } catch (error) {
+        console.error('Error al crear el chat:', error);
       }
     } else {
       console.error('Usuario no definido o sin ID:', usuarioSeleccionado);

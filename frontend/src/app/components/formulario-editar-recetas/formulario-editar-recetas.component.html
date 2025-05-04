@@ -1,0 +1,115 @@
+<div class="container mx-auto mt-4 p-4 bg-white shadow-md rounded">
+  <h2 class="text-2xl font-bold mb-4">Editar Receta</h2>
+  
+  <div *ngIf="loading" class="flex justify-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+  
+  <div *ngIf="errorMessage" class="bg-red-100 text-red-700 p-3 rounded mb-4">
+    {{ errorMessage }}
+  </div>
+  
+  <form [formGroup]="recetaForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+    <input type="hidden" formControlName="id_receta">
+    
+    <div class="mb-4">
+      <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre *</label>
+      <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="nombre" formControlName="nombre" 
+        [ngClass]="{'border-red-500': submitted && recetaForm.get('nombre')?.errors}">
+      <div class="text-red-500 text-sm mt-1" *ngIf="submitted && recetaForm.get('nombre')?.errors?.['required']">
+        El nombre es obligatorio
+      </div>
+      <div class="text-red-500 text-sm mt-1" *ngIf="submitted && recetaForm.get('nombre')?.errors?.['minlength']">
+        El nombre debe tener al menos 3 caracteres
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripción *</label>
+      <textarea class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="descripcion" rows="3" formControlName="descripcion"
+        [ngClass]="{'border-red-500': submitted && recetaForm.get('descripcion')?.errors}"></textarea>
+      <div class="text-red-500 text-sm mt-1" *ngIf="submitted && recetaForm.get('descripcion')?.errors?.['required']">
+        La descripción es obligatoria
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700">Ingredientes y Cantidades *</label>
+      <div formArrayName="ingredientes" class="mb-2">
+        <div class="grid grid-cols-12 gap-4 mb-2" *ngFor="let ingrediente of ingredientes.controls; let i = index">
+          <div class="col-span-6">
+            <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ingrediente" [formControlName]="i"
+              [ngClass]="{'border-red-500': submitted && ingredientes.controls[i].errors}">
+            <div class="text-red-500 text-sm mt-1" *ngIf="submitted && ingredientes.controls[i].errors?.['required']">
+              El ingrediente es obligatorio
+            </div>
+          </div>
+          <div class="col-span-4" formArrayName="cantidades">
+            <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Cantidad" [formControlName]="i">
+          </div>
+          <div class="col-span-2 flex items-center">
+            <button type="button" class="text-red-500 hover:text-red-700" (click)="removeIngrediente(i)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="text-indigo-500 hover:text-indigo-700 flex items-center" (click)="addIngredienteRow()">
+        <i class="bi bi-plus-circle mr-2"></i> Añadir ingrediente
+      </button>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label for="calorias" class="block text-sm font-medium text-gray-700">Calorías</label>
+        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="calorias" formControlName="calorias">
+      </div>
+      <div>
+        <label for="tiempo_preparacion" class="block text-sm font-medium text-gray-700">Tiempo de preparación</label>
+        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="tiempo_preparacion" formControlName="tiempo_preparacion">
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <div>
+        <label for="cantidad_carbohidratos" class="block text-sm font-medium text-gray-700">Carbohidratos</label>
+        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="cantidad_carbohidratos" formControlName="cantidad_carbohidratos">
+      </div>
+      <div>
+        <label for="cantidad_proteinas" class="block text-sm font-medium text-gray-700">Proteínas</label>
+        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="cantidad_proteinas" formControlName="cantidad_proteinas">
+      </div>
+      <div>
+        <label for="cantidad_grasas" class="block text-sm font-medium text-gray-700">Grasas</label>
+        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="cantidad_grasas" formControlName="cantidad_grasas">
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <label for="dificultad" class="block text-sm font-medium text-gray-700">Dificultad</label>
+      <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="dificultad" formControlName="dificultad">
+        <option value="">Seleccionar dificultad</option>
+        <option value="Fácil">Fácil</option>
+        <option value="Media">Media</option>
+        <option value="Difícil">Difícil</option>
+      </select>
+    </div>
+    
+    <div class="mb-4">
+      <label for="imagen" class="block text-sm font-medium text-gray-700">URL de la imagen</label>
+      <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" id="imagen" formControlName="imagen">
+      <div class="text-sm text-gray-500 mt-1">Introduce la URL de una imagen para la receta</div>
+    </div>
+
+    <div class="mt-4" *ngIf="recetaForm.get('imagen')?.value">
+      <img [src]="recetaForm.get('imagen')?.value" alt="Vista previa" class="rounded shadow-md max-h-40">
+    </div>
+    
+    <div class="flex justify-end gap-2 mt-4">
+      <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded shadow hover:bg-indigo-600" [disabled]="recetaForm.invalid">Guardar</button>
+      <button type="button" class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600" (click)="cancelar()">Cancelar</button>
+    </div>
+  </form>
+</div>

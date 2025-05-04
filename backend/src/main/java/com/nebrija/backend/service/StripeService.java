@@ -29,7 +29,7 @@ public class StripeService {
         return customer.getId();
     }
 
-    // Crear método de pago
+    // Crear metodo de pago
     public String createPaymentMethod() throws StripeException {
         PaymentMethodCreateParams params =
                 PaymentMethodCreateParams.builder()
@@ -40,7 +40,7 @@ public class StripeService {
         return paymentMethod.getId();
     }
 
-    // Asociar método de pago a usuario
+    // Asociar metodo de pago a usuario
     public void addPaymentMethodToUser(String customerId, String paymentMethodId) throws StripeException {
         PaymentMethod paymentMethod = PaymentMethod.retrieve(paymentMethodId);
         paymentMethod.attach(

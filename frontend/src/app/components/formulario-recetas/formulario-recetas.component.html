@@ -1,0 +1,72 @@
+<div class="form-container">
+  <h2>Formulario para Insertar Recetas</h2>
+
+  <!-- Mensajes de éxito o error -->
+  <div class="mensaje-container" *ngIf="mostrarMensaje">
+    <div class="mensaje-exito" *ngIf="mensajeExito">{{ mensajeExito }}</div>
+    <div class="mensaje-error" *ngIf="mensajeError">{{ mensajeError }}</div>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #recetaForm="ngForm">
+    <div class="form-group">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" [(ngModel)]="receta.nombre" required />
+    </div>
+
+    <div class="form-group">
+      <label for="descripcion">Descripción:</label>
+      <textarea id="descripcion" name="descripcion" [(ngModel)]="receta.descripcion" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="ingredientes">Ingredientes (separados por comas):</label>
+      <input type="text" id="ingredientes" name="ingredientes" [(ngModel)]="ingredientesInput" required />
+    </div>
+
+    <div class="form-group">
+      <label for="cantidades">Cantidades de los Ingredientes (separadas por comas):</label>
+      <input type="text" id="cantidades" name="cantidades" [(ngModel)]="cantidadesInput" required />
+    </div>
+
+    <div class="form-group">
+      <label for="calorias">Calorías:</label>
+      <input type="text" id="calorias" name="calorias" [(ngModel)]="receta.calorias" required />
+    </div>
+
+    <div class="form-group">
+      <label for="cantidad_carbohidratos">Carbohidratos:</label>
+      <input type="text" id="cantidad_carbohidratos" name="cantidad_carbohidratos" [(ngModel)]="receta.cantidad_carbohidratos" required />
+    </div>
+
+    <div class="form-group">
+      <label for="cantidad_proteinas">Proteínas:</label>
+      <input type="text" id="cantidad_proteinas" name="cantidad_proteinas" [(ngModel)]="receta.cantidad_proteinas" required />
+    </div>
+
+    <div class="form-group">
+      <label for="cantidad_grasas">Grasas:</label>
+      <input type="text" id="cantidad_grasas" name="cantidad_grasas" [(ngModel)]="receta.cantidad_grasas" required />
+    </div>
+
+    <div class="form-group">
+      <label for="tiempo_preparacion">Tiempo de Preparación (en minutos):</label>
+      <input type="text" id="tiempo_preparacion" name="tiempo_preparacion" [(ngModel)]="receta.tiempo_preparacion" required />
+    </div>
+
+    <div class="form-group">
+      <label for="dificultad">Dificultad:</label>
+      <select id="dificultad" name="dificultad" [(ngModel)]="receta.dificultad" required>
+        <option value="Fácil">Fácil</option>
+        <option value="Media">Media</option>
+        <option value="Difícil">Difícil</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="imagen">URL de la Imagen:</label>
+      <input type="text" id="imagen" name="imagen" [(ngModel)]="receta.imagen" required />
+    </div>
+
+    <button type="submit" [disabled]="!recetaForm.form.valid">Guardar Receta</button>
+  </form>
+</div>

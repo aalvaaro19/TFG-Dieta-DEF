@@ -29,7 +29,7 @@ public class RecetaController {
             List<Receta> recetas = recetaService.getDataRecetas("recetas");
             return ResponseEntity.ok(recetas);
         } catch (ExecutionException | InterruptedException e) {
-            log.error(String.valueOf(e));
+            log.error("Error al obtener todas las recetas: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -38,43 +38,105 @@ public class RecetaController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Receta> getReceta(@PathVariable String id_receta) {
         try {
-            List<Receta> recetas = recetaService.getDataRecetas("recetas");
-            for (Receta receta : recetas) {
-                if (receta.getId_receta().equals(id_receta)) {
-                    return ResponseEntity.ok(receta);
-                }
+            Receta receta = recetaService.getRecetaById(id_receta);
+            if (receta != null) {
+                return ResponseEntity.ok(receta);
             }
             return ResponseEntity.notFound().build();
         } catch (ExecutionException | InterruptedException e) {
-            log.error(String.valueOf(e));
+            log.error("Error al obtener receta con id {}: {}", id_receta, e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
         }
     }
 
     @PostMapping("/admin/recetas/saveReceta")
     @PreAuthorize("hasRole('ADMIN')")
-    public void saveReceta(@RequestBody Receta receta) {
-        recetaService.createReceta(receta.getId_receta(), receta.getNombre(), receta.getDescripcion(), receta.getIngredientes(), receta.getCalorias(),
-                receta.getCantidad_carbohidratos(), receta.getCantidad_proteinas(), receta.getCantidad_grasas(), receta.getTiempo_preparacion(), receta.getDificultad(), receta.getImagen());
+    public ResponseEntity<?> saveReceta(@RequestBody Receta receta) {
+        try {
+            boolean result = recetaService.createReceta(
+                    receta.getNombre(),
+                    receta.getDescripcion(),
+                    receta.getIngredientes(),
+                    receta.getCantidades(),
+                    receta.getCalorias(),
+                    receta.getCantidad_carbohidratos(),
+                    receta.getCantidad_proteinas(),
+                    receta.getCantidad_grasas(),
+                    receta.getTiempo_preparacion(),
+                    receta.getDificultad(),
+                    receta.getImagen()
+            );
+
+            if (result) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.internalServerError().build();
+            }
+        } catch (Exception e) {
+            log.error("Error al guardar receta: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body("Error al guardar la receta: " + e.getMessage());
+        }
     }
 
     @PutMapping("/admin/recetas/updateReceta")
     @PreAuthorize("hasRole('ADMIN')")
-    public void updateReceta(@RequestBody Receta receta) {
-        recetaService.updateReceta(receta.getId_receta(), receta.getNombre(), receta.getDescripcion(), receta.getIngredientes(), receta.getCalorias(),
-                receta.getCantidad_carbohidratos(), receta.getCantidad_proteinas(), receta.getCantidad_grasas(), receta.getTiempo_preparacion(), receta.getDificultad(), receta.getImagen());
+    public ResponseEntity<?> updateReceta(@RequestBody Receta receta) {
+        try {
+            boolean result = recetaService.updateReceta(
+                    receta.getId_receta(),
+                    receta.getNombre(),
+                    receta.getDescripcion(),
+                    receta.getIngredientes(),
+                    receta.getCantidades(),
+                    receta.getCalorias(),
+                    receta.getCantidad_carbohidratos(),
+                    receta.getCantidad_proteinas(),
+                    receta.getCantidad_grasas(),
+                    receta.getTiempo_preparacion(),
+                    receta.getDificultad(),
+                    receta.getImagen()
+            );
+
+            if (result) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("Error al actualizar receta: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body("Error al actualizar la receta: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/admin/recetas/deleteReceta/{id_receta}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteReceta(@PathVariable String id_receta) {
-        recetaService.deleteReceta(id_receta);
+    public ResponseEntity<?> deleteReceta(@PathVariable String id_receta) {
+        try {
+            boolean result = recetaService.deleteReceta(id_receta);
+            if (result) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("Error al eliminar receta con id {}: {}", id_receta, e.getMessage(), e);
+            return ResponseEntity.internalServerError().body("Error al eliminar la receta: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/admin/recetas/deleteAllRecetas")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteAllRecetas() {
-        recetaService.deleteAllRecetas();
+    public ResponseEntity<?> deleteAllRecetas() {
+        try {
+            boolean result = recetaService.deleteAllRecetas();
+            if (result) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.internalServerError().build();
+            }
+        } catch (Exception e) {
+            log.error("Error al eliminar todas las recetas: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body("Error al eliminar todas las recetas: " + e.getMessage());
+        }
     }
-
 }

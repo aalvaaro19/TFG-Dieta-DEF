@@ -1,0 +1,12 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4">Chats</h2>
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let chat of chats">
+          {{ chat.text }} + {{ chat.sender }} + {{ chat.receiver }} + {{ chat.read }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -6,14 +6,19 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from '@angular/fire/auth';
 import { firstValueFrom } from 'rxjs';
+import { FormularioRecetasComponent } from "../formulario-recetas/formulario-recetas.component";
+import { PaginaRecetasComponent } from "../../pages/pagina-recetas/pagina-recetas.component";
+import { ProgresoComponent } from "../progreso/progreso.component";
+import { ProgresoWidgetComponent } from '../progreso-widget/progreso-widget.component';
 
 @Component({
   selector: 'app-listar-usuarios',
-  imports: [CommonModule, CartaPersonalComponent],
+  imports: [CommonModule, CartaPersonalComponent, FormularioRecetasComponent, PaginaRecetasComponent, ProgresoComponent, ProgresoWidgetComponent],
   templateUrl: './listar-usuarios.component.html',
   styleUrl: './listar-usuarios.component.scss'
 })
 export class ListarUsuariosComponent {
+user: any;
   
   constructor(private authService: AuthService, private router: Router, private http: HttpClient) { }
 

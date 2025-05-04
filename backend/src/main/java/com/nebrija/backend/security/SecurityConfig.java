@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Rutas de usuarios autenticados
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/chat/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(firebaseAuthFilter, UsernamePasswordAuthenticationFilter.class)

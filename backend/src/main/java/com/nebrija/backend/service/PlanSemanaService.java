@@ -24,7 +24,10 @@ public class PlanSemanaService {
         this.firebaseDatabase = firebaseDatabase;
     }
 
-    // Obtener todos los planes de la semana
+    /**
+     * Obtiene todos los planes de la semana
+     * @return Lista de planes de la semana
+     */
     public List<PlanSemana> getAllPlanesSemana() throws ExecutionException, InterruptedException {
         CompletableFuture<List<PlanSemana>> future = new CompletableFuture<>();
 
@@ -35,8 +38,10 @@ public class PlanSemanaService {
                 List<PlanSemana> planesList = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Map<String, Object> planData = (Map<String, Object>) snapshot.getValue();
-                    PlanSemana plan = PlanSemana.fromMap(planData);
-                    planesList.add(plan);
+                    if (planData != null) {
+                        PlanSemana plan = PlanSemana.fromMap(planData);
+                        planesList.add(plan);
+                    }
                 }
                 future.complete(planesList);
             }
@@ -50,19 +55,34 @@ public class PlanSemanaService {
         return future.get();
     }
 
-    // Guardar un plan de la semana en Firebase
-    public void createPlanSemana(PlanSemana planSemana) {
+    /**
+     * Guarda un nuevo plan de la semana en Firebase
+     * @param planSemana Plan de la semana a guardar
+     * @return booleano indicando si la operación fue exitosa
+     */
+    public boolean createPlanSemana(PlanSemana planSemana) {
         try {
+            if (planSemana.getId_planSemana() == null || planSemana.getId_planSemana().isEmpty()) {
+                System.err.println("Error: El ID del plan no puede estar vacío");
+                return false;
+            }
+
             DatabaseReference ref = firebaseDatabase.getReference(PLANES_PATH).child(planSemana.getId_planSemana());
             ApiFuture<Void> future = ref.setValueAsync(planSemana.toMapRecetaReceta());
             future.get();
-            System.out.println("Plan de la semana guardado correctamente.");
+            System.out.println("Plan de la semana guardado correctamente: " + planSemana.getId_planSemana());
+            return true;
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error al guardar el plan: " + e.getMessage());
+            return false;
         }
     }
 
-    // Obtener un plan de la semana por su ID
+    /**
+     * Obtiene un plan de la semana por su ID
+     * @param id_planSemana ID del plan de la semana
+     * @return Plan de la semana encontrado o null si no existe
+     */
     public PlanSemana getPlanSemanaById(String id_planSemana) throws ExecutionException, InterruptedException {
         CompletableFuture<PlanSemana> future = new CompletableFuture<>();
 
@@ -72,8 +92,12 @@ public class PlanSemanaService {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     Map<String, Object> planData = (Map<String, Object>) dataSnapshot.getValue();
-                    PlanSemana plan = PlanSemana.fromMap(planData);
-                    future.complete(plan);
+                    if (planData != null) {
+                        PlanSemana plan = PlanSemana.fromMap(planData);
+                        future.complete(plan);
+                    } else {
+                        future.complete(null);
+                    }
                 } else {
                     future.complete(null);
                 }
@@ -88,39 +112,106 @@ public class PlanSemanaService {
         return future.get();
     }
 
-    // Actualizar un plan de la semana en Firebase
-    public void updatePlanSemana(PlanSemana planSemana) {
+    /**
+     * Actualiza un plan de la semana existente en Firebase
+     * @param planSemana Plan de la semana con los datos actualizados
+     * @return booleano indicando si la operación fue exitosa
+     */
+    public boolean updatePlanSemana(PlanSemana planSemana) {
         try {
+            if (planSemana.getId_planSemana() == null || planSemana.getId_planSemana().isEmpty()) {
+                System.err.println("Error: El ID del plan no puede estar vacío");
+                return false;
+            }
+
             DatabaseReference ref = firebaseDatabase.getReference(PLANES_PATH).child(planSemana.getId_planSemana());
+
+            // Verificar primero si el plan existe
+            CompletableFuture<Boolean> checkExists = new CompletableFuture<>();
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    checkExists.complete(dataSnapshot.exists());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    checkExists.completeExceptionally(databaseError.toException());
+                }
+            });
+
+            if (!checkExists.get()) {
+                System.err.println("Error: El plan con ID " + planSemana.getId_planSemana() + " no existe");
+                return false;
+            }
+
             ApiFuture<Void> future = ref.setValueAsync(planSemana.toMapRecetaReceta());
             future.get();
-            System.out.println("Plan de la semana actualizado correctamente.");
+            System.out.println("Plan de la semana actualizado correctamente: " + planSemana.getId_planSemana());
+            return true;
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error al actualizar el plan: " + e.getMessage());
+            return false;
         }
     }
 
-    // Eliminar un plan de la semana por ID
-    public void deletePlanSemana(String id_planSemana) {
+    /**
+     * Elimina un plan de la semana por su ID
+     * @param id_planSemana ID del plan de la semana a eliminar
+     * @return booleano indicando si la operación fue exitosa
+     */
+    public boolean deletePlanSemana(String id_planSemana) {
         try {
+            if (id_planSemana == null || id_planSemana.isEmpty()) {
+                System.err.println("Error: El ID del plan no puede estar vacío");
+                return false;
+            }
+
             DatabaseReference ref = firebaseDatabase.getReference(PLANES_PATH).child(id_planSemana);
+
+            // Verificar primero si el plan existe
+            CompletableFuture<Boolean> checkExists = new CompletableFuture<>();
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    checkExists.complete(dataSnapshot.exists());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    checkExists.completeExceptionally(databaseError.toException());
+                }
+            });
+
+            if (!checkExists.get()) {
+                System.err.println("Error: El plan con ID " + id_planSemana + " no existe");
+                return false;
+            }
+
             ApiFuture<Void> future = ref.removeValueAsync();
             future.get();
-            System.out.println("Plan de la semana eliminado correctamente.");
+            System.out.println("Plan de la semana eliminado correctamente: " + id_planSemana);
+            return true;
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error al eliminar el plan: " + e.getMessage());
+            return false;
         }
     }
 
-    // Eliminar todos los planes de la semana
-    public void deleteAllPlanesSemana() {
+    /**
+     * Elimina todos los planes de la semana
+     * @return booleano indicando si la operación fue exitosa
+     */
+    public boolean deleteAllPlanesSemana() {
         try {
             DatabaseReference ref = firebaseDatabase.getReference(PLANES_PATH);
             ApiFuture<Void> future = ref.removeValueAsync();
             future.get();
             System.out.println("Todos los planes de la semana eliminados correctamente.");
+            return true;
         } catch (InterruptedException | ExecutionException e) {
             System.err.println("Error al eliminar todos los planes: " + e.getMessage());
+            return false;
         }
     }
 }

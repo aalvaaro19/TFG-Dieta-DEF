@@ -9,6 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 export class AuthService {
   private refreshTokenTimer: any;
   public currentUser = new BehaviorSubject<any>(null);
+  public chats: any[] = [];
 
   constructor(private auth: Auth, private firestore: Firestore) {
     // Observador para mantener la información del usuario actualizada
@@ -111,5 +112,34 @@ export class AuthService {
     const usersSnap = await getDocs(usersRef);
     const users = usersSnap.docs.map(doc => doc.data());
     return users;
+  }
+
+  async getCurrentUser() {
+    return this.currentUser.value;
+  }
+
+  async getChats() {
+    fetch('http://localhost:8080/listarChats')
+      .then(response => response.json())
+      .then(data => {
+        this.chats = data;
+      })
+      .catch(error => {
+        console.error('Error fetching chats:', error);
+      });
+  }
+
+  async createChat(newChat: any) {
+    return fetch('http://localhost:8080/crearChat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newChat)
+    })
+      .then(response => response.json())
+      .catch(error => {
+        console.error('Error creating chat:', error);
+      });
   }
 }
