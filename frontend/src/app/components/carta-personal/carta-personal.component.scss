@@ -4,3 +4,30 @@
   justify-content:space-between;
   flex-wrap: wrap;
 }
+
+/* En tu archivo carta-personal.component.scss */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Para crear el efecto de desenfoque en la imagen de fondo */
+.blur {
+  filter: blur(8px);
+  transform: scale(1.1);
+}
+
+/* Para evitar problemas de scroll en ciertas situaciones */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+}

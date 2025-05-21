@@ -9,6 +9,7 @@ import { PaginaChatIndividualComponent } from './pages/pagina-chat-individual/pa
 import { FormularioEditarRecetasComponent } from './components/formulario-editar-recetas/formulario-editar-recetas.component';
 import { FormularioProgresoComponent } from './components/formulario-progreso/formulario-progreso.component';
 import { FormularioEditarDiasSemanaComponent } from './components/formulario-editar-dias-semana/formulario-editar-dias-semana.component';
+import { FormularioEditarPlanesSemanalesComponent } from './components/formulario-editar-planes-semanales/formulario-editar-planes-semanales.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -22,4 +23,5 @@ export const routes: Routes = [
   { path: 'recetas/editar/:id', component: FormularioEditarRecetasComponent },
   { path: 'formularioProgreso', component: FormularioProgresoComponent },
   { path: 'formularioEditarDiaSemana/:id', component: FormularioEditarDiasSemanaComponent },
+  { path: 'formularioEditaPlanesSemanales/:id', component: FormularioEditarPlanesSemanalesComponent },
 ];

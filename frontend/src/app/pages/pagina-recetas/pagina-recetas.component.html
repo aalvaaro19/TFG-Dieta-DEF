@@ -10,9 +10,116 @@
         <p class="mt-2 text-gray-900 font-bold">Calorías: {{ receta.calorias }}</p>
         <div class="mt-4">
           <!-- <button class="bg-green-500 text-white px-4 py-2 rounded mr-2" (click)="viewDetails(receta)">Detalles</button> -->
+          <button class="bg-yellow-500 text-white px-4 py-2 rounded mr-2" (click)="mostrarDetallesReceta(receta)">
+            <i class="bi bi-info-circle"></i> Características
+          </button>
           <button class="bg-blue-500 text-white px-4 py-2 rounded mr-2" (click)="editarReceta(receta.id_receta)"><i class="bi bi-pencil"></i> Editar</button>
           <button class="bg-red-500 text-white px-4 py-2 rounded" (click)="deleteReceta(receta.id_receta)">Eliminar</button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de detalles de receta -->
+<div *ngIf="mostrarModal && recetaModal" 
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+     (click)="cerrarModal()">
+  
+  <!-- Contenido del modal -->
+  <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-auto overflow-hidden animate-fade-in"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Encabezado con imagen -->
+    <div class="relative h-64 overflow-hidden">
+      <img [src]="obtenerUrlImagen(recetaModal)" 
+           alt="Foto de la receta" 
+           class="w-full h-full object-cover">
+      
+      <!-- Overlay con título -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent flex items-end">
+        <div class="p-6 text-white">
+          <h2 class="text-3xl font-bold">{{ recetaModal.nombre }}</h2>
+          <div class="flex items-center mt-2">
+            <span class="mr-4 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs">
+              {{ recetaModal.dificultad }}
+            </span>
+            <span class="flex items-center text-yellow-300">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 2a.75.75 0 01.75.75v5.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0L6.2 7.26a.75.75 0 111.1-1.02l1.95 2.1V2.75A.75.75 0 0110 2z" />
+                <path d="M5.22 14.78a.75.75 0 001.06 0l4-4a.75.75 0 10-1.06-1.06l-4 4a.75.75 0 000 1.06z" />
+              </svg>
+              {{ recetaModal.tiempo_preparacion }}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botón para cerrar -->
+      <button (click)="cerrarModal()" class="absolute top-4 right-4 text-white bg-black bg-opacity-30 hover:bg-opacity-50 rounded-full p-2 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="p-6">
+      <!-- Descripción -->
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Descripción</h3>
+        <p class="text-gray-600">{{ recetaModal.descripcion }}</p>
+      </div>
+      
+      <!-- Información nutricional -->
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-3">Información Nutricional</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-blue-50 p-4 rounded-lg text-center">
+            <span class="block text-xl font-bold text-blue-600">{{ recetaModal.calorias }}</span>
+            <span class="text-sm text-gray-500">Calorías</span>
+          </div>
+          <div class="bg-red-50 p-4 rounded-lg text-center">
+            <span class="block text-xl font-bold text-red-600">{{ recetaModal.cantidad_carbohidratos }}</span>
+            <span class="text-sm text-gray-500">Carbohidratos</span>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg text-center">
+            <span class="block text-xl font-bold text-green-600">{{ recetaModal.cantidad_proteinas }}</span>
+            <span class="text-sm text-gray-500">Proteínas</span>
+          </div>
+          <div class="bg-yellow-50 p-4 rounded-lg text-center">
+            <span class="block text-xl font-bold text-yellow-600">{{ recetaModal.cantidad_grasas }}</span>
+            <span class="text-sm text-gray-500">Grasas</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Ingredientes -->
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Ingredientes</h3>
+        <ul class="list-disc list-inside text-gray-600 space-y-1">
+          <li *ngFor="let ingrediente of recetaModal.ingredientes">{{ ingrediente }}</li>
+          <li *ngIf="!recetaModal.ingredientes || recetaModal.ingredientes.length === 0">
+            No hay ingredientes registrados
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Pie del modal -->
+    <div class="bg-gray-50 p-4 border-t flex justify-between items-center">
+      <div class="text-gray-500 text-sm">
+        <span class="font-medium">ID:</span> {{ recetaModal.id_receta }}
+      </div>
+      <div class="space-x-2">
+        <button (click)="editarReceta(recetaModal.id_receta)" 
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+          Editar Receta
+        </button>
+        <button (click)="cerrarModal()" 
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg transition-colors">
+          Cerrar
+        </button>
       </div>
     </div>
   </div>

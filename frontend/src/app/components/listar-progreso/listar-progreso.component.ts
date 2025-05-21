@@ -65,6 +65,7 @@ export class ListarProgresoComponent implements OnInit {
         this.progresos = this.sortProgresosByDate(data);
         
         this.loadUsersInfo();
+        console.log('Progresos sorted by date:', this.progresos);
         
         this.loading = false;
       },

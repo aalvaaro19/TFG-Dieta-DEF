@@ -19,6 +19,10 @@ export class PaginaRecetasComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
   selectedReceta: Receta | null = null;
+  
+  // Variables para el modal
+  mostrarModal: boolean = false;
+  recetaModal: Receta | null = null;
 
   constructor(
     private recetaService: RecetaService,
@@ -89,5 +93,49 @@ export class PaginaRecetasComponent implements OnInit {
           this.setError('Error al eliminar la receta: ' + err.message);
         }
       });
+  }
+
+  // Método actualizado para mostrar el modal con los detalles de la receta
+  mostrarDetallesReceta(receta: Receta): void {
+    this.recetaModal = receta;
+    this.mostrarModal = true;
+    // Prevenir el scroll en el body mientras el modal está abierto
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Método para cerrar el modal
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.recetaModal = null;
+    // Restaurar el scroll en el body
+    document.body.style.overflow = 'auto';
+  }
+
+  // Método para formatear los ingredientes como lista
+  formatearIngredientes(ingredientes: string[] | null): string {
+    if (!ingredientes || ingredientes.length === 0) {
+      return 'No hay ingredientes registrados';
+    }
+    return ingredientes.join(', ');
+  }
+
+  // Método para determinar si una imagen es una URL o una ruta local
+  esImagenUrl(rutaImagen: string): boolean {
+    return typeof rutaImagen === 'string' && (rutaImagen.startsWith('http://') || rutaImagen.startsWith('https://'));
+  }
+
+  // Método para obtener la URL de la imagen
+  obtenerUrlImagen(receta: Receta): string {
+    if (!receta.imagen) {
+      return 'assets/images/default-recipe.jpg'; // Imagen por defecto
+    }
+    
+    // Si es una URL, devolverla directamente
+    if (this.esImagenUrl(receta.imagen)) {
+      return receta.imagen;
+    }
+    
+    // Si no, devolver la ruta local
+    return `../../../images/${receta.imagen}.jpg`;
   }
 }

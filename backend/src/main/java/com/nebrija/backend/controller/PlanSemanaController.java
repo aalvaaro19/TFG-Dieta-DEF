@@ -22,19 +22,21 @@ public class PlanSemanaController {
     @Autowired
     private PlanSemanaService planSemanaService;
 
-    @GetMapping("/admin/planes-semana/getAllPlanes")
+    // Endpoint para obtener todos los planes (requiere rol ADMIN)
+    @GetMapping("/admin/getAllPlanes")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PlanSemana>> getAllPlanes() {
         try {
             List<PlanSemana> planes = planSemanaService.getAllPlanesSemana();
             return ResponseEntity.ok(planes);
         } catch (ExecutionException | InterruptedException e) {
-            log.error("Error al obtener los planes de la semana: ", e);
+            log.error("Error al obtener todos los planes de la semana: ", e);
             return ResponseEntity.internalServerError().build();
         }
     }
 
-    @GetMapping("/admin/planes-semana/getPlan/{id_plan}")
+    // Endpoint para obtener un plan específico por ID (requiere rol ADMIN)
+    @GetMapping("/admin/getPlan/{id_plan}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlanSemana> getPlan(@PathVariable String id_plan) {
         try {
@@ -50,27 +52,67 @@ public class PlanSemanaController {
         }
     }
 
-    @PostMapping("/admin/planes-semana/savePlan")
+    // Endpoint para crear un nuevo plan (requiere rol ADMIN)
+    @PostMapping("/admin/savePlan")
     @PreAuthorize("hasRole('ADMIN')")
-    public void savePlan(@RequestBody PlanSemana planSemana) {
-        planSemanaService.createPlanSemana(planSemana);
+    public ResponseEntity<Void> savePlan(@RequestBody PlanSemana planSemana) {
+        try {
+            planSemanaService.createPlanSemana(planSemana);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Error al guardar el plan de la semana: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
-    @PutMapping("/admin/planes-semana/updatePlan")
+    // Endpoint para actualizar un plan existente (requiere rol ADMIN)
+    @PutMapping("/admin/updatePlan")
     @PreAuthorize("hasRole('ADMIN')")
-    public void updatePlan(@RequestBody PlanSemana planSemana) {
-        planSemanaService.updatePlanSemana(planSemana);
+    public ResponseEntity<Void> updatePlan(@RequestBody PlanSemana planSemana) {
+        try {
+            planSemanaService.updatePlanSemana(planSemana);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Error al actualizar el plan de la semana: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
-    @DeleteMapping("/admin/planes-semana/deletePlan/{id_plan}")
+    // Endpoint para eliminar un plan específico (requiere rol ADMIN)
+    @DeleteMapping("/admin/deletePlan/{id_plan}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deletePlan(@PathVariable String id_plan) {
-        planSemanaService.deletePlanSemana(id_plan);
+    public ResponseEntity<Void> deletePlan(@PathVariable String id_plan) {
+        try {
+            planSemanaService.deletePlanSemana(id_plan);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Error al eliminar el plan de la semana: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
-    @DeleteMapping("/admin/planes-semana/deleteAllPlanes")
+    // Endpoint para eliminar todos los planes (requiere rol ADMIN)
+    @DeleteMapping("/admin/deleteAllPlanes")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteAllPlanes() {
-        planSemanaService.deleteAllPlanesSemana();
+    public ResponseEntity<Void> deleteAllPlanes() {
+        try {
+            planSemanaService.deleteAllPlanesSemana();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Error al eliminar todos los planes de la semana: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // Endpoint para obtener los planes de un usuario específico (accesible para usuarios autenticados)
+    @GetMapping("/users/getMisPlanes/{id_usuario}")
+    public ResponseEntity<List<PlanSemana>> getPlanesUsuario(@PathVariable String id_usuario) {
+        try {
+            List<PlanSemana> planes = planSemanaService.getPlanesUsuario(id_usuario);
+            return ResponseEntity.ok(planes);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Error al obtener los planes del usuario: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

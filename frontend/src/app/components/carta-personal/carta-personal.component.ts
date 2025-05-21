@@ -18,6 +18,10 @@ export class CartaPersonalComponent implements OnInit {
   users: any[] = [];
   isLoggedIn: boolean = false;
   usuario: User | null = null;
+  
+  // Variables para el modal
+  mostrarModal: boolean = false;
+  usuarioModal: any = null;
 
   constructor(
     private auth: Auth,  // Para verificar el estado de autenticación
@@ -129,4 +133,54 @@ export class CartaPersonalComponent implements OnInit {
     }
   }
   
+  // Método para mostrar el modal con los detalles del usuario
+  mostrarDetallesUsuario(usuarioSeleccionado: any): void {
+    this.usuarioModal = usuarioSeleccionado;
+    this.mostrarModal = true;
+    // Prevenir el scroll en el body mientras el modal está abierto
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Método para cerrar el modal
+  cerrarModal(): void {
+    this.mostrarModal = false;
+    this.usuarioModal = null;
+    // Restaurar el scroll en el body
+    document.body.style.overflow = 'auto';
+  }
+
+  // Método para obtener la URL de la imagen del usuario
+  obtenerUrlImagen(usuario: any): string {
+    if (!usuario.imagen) {
+      return 'assets/images/default-user.jpg'; // Imagen por defecto
+    }
+    
+    // Si es una URL, devolverla directamente
+    if (usuario.imagen.startsWith('http://') || usuario.imagen.startsWith('https://')) {
+      return usuario.imagen;
+    }
+    
+    // Si no, devolver la ruta local
+    return `../../../images/${usuario.imagen}.jpg`;
+  }
+
+  // Método para calcular el IMC del usuario
+  calcularIMC(peso: number, altura: number): number {
+    // Altura en metros (si viene en cm)
+    const alturaMetros = altura >= 3 ? altura / 100 : altura;
+    return +(peso / (alturaMetros * alturaMetros)).toFixed(2);
+  }
+
+  // Método para interpretar el IMC
+  interpretarIMC(imc: number): { texto: string, clase: string } {
+    if (imc < 18.5) {
+      return { texto: 'Bajo peso', clase: 'text-blue-600 bg-blue-100' };
+    } else if (imc >= 18.5 && imc < 25) {
+      return { texto: 'Peso normal', clase: 'text-green-600 bg-green-100' };
+    } else if (imc >= 25 && imc < 30) {
+      return { texto: 'Sobrepeso', clase: 'text-yellow-600 bg-yellow-100' };
+    } else {
+      return { texto: 'Obesidad', clase: 'text-red-600 bg-red-100' };
+    }
+  }
 }
