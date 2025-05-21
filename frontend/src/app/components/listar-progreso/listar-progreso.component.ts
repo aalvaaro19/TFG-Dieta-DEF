@@ -151,4 +151,52 @@ export class ListarProgresoComponent implements OnInit {
       });
     }
   }
+
+  // Métodos modificados para manejar valores string
+  getProgresoAnterior(index: number): Progreso | null {
+    if (index <= 0 || index >= this.progresos.length) {
+      return null;
+    }
+    return this.progresos[index - 1];
+  }
+
+  // Convierte strings a números antes de calcular la diferencia
+  parseNumber(value: any): number {
+    if (value === null || value === undefined || value === '') {
+      return 0;
+    }
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
+  calcularDiferencia(valorActual: any, valorAnterior: any): number {
+    const numActual = this.parseNumber(valorActual);
+    const numAnterior = this.parseNumber(valorAnterior);
+    return parseFloat((numActual - numAnterior).toFixed(2));
+  }
+
+  getColorClase(diferencia: number): string {
+    if (diferencia > 0) {
+      return 'text-red-600 font-medium'; // Positivo (aumento) en rojo
+    } else if (diferencia < 0) {
+      return 'text-green-600 font-medium'; // Negativo (disminución) en verde
+    }
+    return 'text-gray-600';
+  }
+
+  // Para algunos valores como masa muscular, un aumento es generalmente positivo,
+  // por lo que invertimos los colores
+  getColorClaseInvertido(diferencia: number): string {
+    if (diferencia > 0) {
+      return 'text-green-600 font-medium'; // Positivo (aumento) en verde
+    } else if (diferencia < 0) {
+      return 'text-red-600 font-medium'; // Negativo (disminución) en rojo
+    }
+    return 'text-gray-600';
+  }
+
+  formatDiferencia(diferencia: number): string {
+    const signo = diferencia > 0 ? '+' : '';
+    return `${signo}${diferencia}`;
+  }
 }

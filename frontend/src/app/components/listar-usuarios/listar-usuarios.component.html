@@ -1,14 +1,12 @@
 <div class="p-6 bg-white shadow-lg rounded-lg">
   <h2 class="text-2xl font-bold text-blue-900 mb-4 text-center">Lista de los usuarios registrados</h2>
   <app-carta-personal></app-carta-personal>
-  
-  <app-formulario-recetas></app-formulario-recetas>
 
-  <h1>RECETAS DISPONIBLES DE LA BBDD</h1>
-  <app-pagina-recetas></app-pagina-recetas>
+  <h1>LISTA DE LOS PLANES DE DIA DE LA SEMANA</h1>
+  <app-listar-dias-semana></app-listar-dias-semana>
 
-  <h1>PROGRESO DE LOS USUARIOS</h1>
-  <app-listar-progreso></app-listar-progreso>
+  <h1>FORMULARIO PARA AÑADIR EL PLAN DE UN DIA DE LA SEMANA</h1>
+  <app-dia-semana-formulario></app-dia-semana-formulario>
 
   <button (click)="logout()">
     Logout

@@ -1,0 +1,164 @@
+<div class="dia-semana-formulario p-6 bg-white shadow-md rounded-md">
+  <h2 class="text-2xl font-bold mb-4">
+    {{ modoEdicion ? 'Editar Día de la Semana' : 'Crear Nuevo Día de la Semana' }}
+  </h2>
+
+  <form (ngSubmit)="guardarDia()" class="space-y-4">
+    <div class="form-group">
+      <label for="dia_semana" class="block text-sm font-medium text-gray-700">Día de la Semana:</label>
+      <select
+        id="dia_semana"
+        [(ngModel)]="dia.dia_semana"
+        name="dia_semana"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      >
+        <option *ngFor="let dia of diasSemana" [value]="dia">{{ dia }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="objetivoCaloriasDelDia" class="block text-sm font-medium text-gray-700">Objetivo de Calorías:</label>
+      <input
+        type="number"
+        id="objetivoCaloriasDelDia"
+        [(ngModel)]="dia.objetivoCaloriasDelDia"
+        name="objetivoCaloriasDelDia"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="objetivoProteinasDelDia" class="block text-sm font-medium text-gray-700">Objetivo de Proteínas:</label>
+      <input
+        type="number"
+        id="objetivoProteinasDelDia"
+        [(ngModel)]="dia.objetivoProteinasDelDia"
+        name="objetivoProteinasDelDia"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="objetivoCarbohidratosDelDia" class="block text-sm font-medium text-gray-700">Objetivo de Carbohidratos:</label>
+      <input
+        type="number"
+        id="objetivoCarbohidratosDelDia"
+        [(ngModel)]="dia.objetivoCarbohidratosDelDia"
+        name="objetivoCarbohidratosDelDia"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="objetivoGrasasDelDia" class="block text-sm font-medium text-gray-700">Objetivo de Grasas:</label>
+      <input
+        type="number"
+        id="objetivoGrasasDelDia"
+        [(ngModel)]="dia.objetivoGrasasDelDia"
+        name="objetivoGrasasDelDia"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="numeroComidasDia" class="block text-sm font-medium text-gray-700">Número de Comidas:</label>
+      <input
+        type="number"
+        id="numeroComidasDia"
+        [(ngModel)]="dia.numeroComidasDia"
+        name="numeroComidasDia"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="recomendacionesDelDia" class="block text-sm font-medium text-gray-700">Recomendaciones:</label>
+      <textarea
+        id="recomendacionesDelDia"
+        [(ngModel)]="dia.recomendacionesDelDia"
+        name="recomendacionesDelDia"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="fechaDia" class="block text-sm font-medium text-gray-700">Fecha:</label>
+      <input
+        type="date"
+        id="fechaDia"
+        [(ngModel)]="dia.fechaDia"
+        name="fechaDia"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="estadoDia" class="block text-sm font-medium text-gray-700">Estado:</label>
+      <select
+        id="estadoDia"
+        [(ngModel)]="dia.estadoDia"
+        name="estadoDia"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      >
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="COMPLETADO">Completado</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="block text-sm font-medium text-gray-700">Recetas Disponibles:</label>
+      <ul class="mt-2 space-y-2">
+        <li *ngFor="let receta of recetasDisponibles" class="flex items-center justify-between">
+          <span>{{ receta.nombre }}</span>
+          <button
+            type="button"
+            (click)="agregarReceta(receta)"
+            class="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Agregar
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="form-group">
+      <label class="block text-sm font-medium text-gray-700">Recetas Seleccionadas:</label>
+      <ul class="mt-2 space-y-2">
+        <li *ngFor="let receta of recetasSeleccionadas; let i = index" class="flex items-center justify-between">
+          <span>{{ receta.nombre }}</span>
+          <button
+            type="button"
+            (click)="quitarReceta(i)"
+            class="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+          >
+            Quitar
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="form-actions flex space-x-4">
+      <button
+        type="submit"
+        class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+      >
+        Guardar
+      </button>
+      <button
+        type="button"
+        (click)="cancelar()"
+        class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+      >
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>
