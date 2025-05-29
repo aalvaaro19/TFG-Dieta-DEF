@@ -1,7 +1,7 @@
 <div class="container mx-auto p-4 max-w-lg">
-  <div class="bg-white rounded-lg shadow-lg p-8">
+  <div class="bg-white rounded-lg shadow p-8">
     <!-- Título del formulario -->
-    <h2 class="text-3xl font-extrabold text-blue-900 mb-8 text-center tracking-tight">
+    <h2 class="text-2xl font-bold text-blue-900 mb-6 text-center">
       {{ isEditing ? 'Editar Plan Semanal' : 'Crear Nuevo Plan Semanal' }}
     </h2>
 
@@ -14,33 +14,71 @@
     </div>
 
     <!-- Formulario -->
-    <form (ngSubmit)="guardarPlan()" class="space-y-6">
+    <form (ngSubmit)="guardarPlan()" class="space-y-4">
+      
+      <!-- Selección de Usuario -->
+      <div>
+        <label for="usuarioAsignado" class="block text-sm font-medium text-gray-700 mb-1">
+          Usuario asignado <span class="text-red-500">*</span>
+        </label>
+        
+        <div *ngIf="cargandoUsuarios" class="flex items-center justify-center py-3">
+          <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500 mr-2"></div>
+          <span class="text-gray-600">Cargando usuarios...</span>
+        </div>
+        
+        <select *ngIf="!cargandoUsuarios"
+          id="usuarioAsignado"
+          name="usuarioAsignado"
+          [(ngModel)]="plan.id_usuario"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required>
+          <option value="">Selecciona un usuario</option>
+          <option *ngFor="let usuario of usuariosDisponibles" [value]="usuario.id_usuario">
+            {{ usuario.nombreCompleto }} - {{ usuario.email }}
+          </option>
+        </select>
+        
+        <!-- Información del usuario seleccionado -->
+        <div *ngIf="plan.id_usuario && !cargandoUsuarios" class="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div class="text-sm text-blue-800">
+            <strong>Usuario seleccionado:</strong> {{ obtenerNombreUsuario(plan.id_usuario) }}
+          </div>
+        </div>
+      </div>
+
       <!-- Fechas del plan -->
       <div>
-        <label for="fechaInicio" class="block text-gray-700 font-semibold mb-1">Fecha de inicio</label>
+        <label for="fechaInicio" class="block text-sm font-medium text-gray-700 mb-1">
+          Fecha de inicio <span class="text-red-500">*</span>
+        </label>
         <input type="date"
           id="fechaInicio"
           name="fechaInicio"
           [(ngModel)]="plan.fechaInicio"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required>
       </div>
 
       <div>
-        <label for="fechaFin" class="block text-gray-700 font-semibold mb-1">Fecha de fin</label>
+        <label for="fechaFin" class="block text-sm font-medium text-gray-700 mb-1">
+          Fecha de fin <span class="text-red-500">*</span>
+        </label>
         <input type="date"
           id="fechaFin"
           name="fechaFin"
           [(ngModel)]="plan.fechaFin"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required>
       </div>
 
       <!-- Estado del plan -->
       <div>
-        <label for="estadoPlan" class="block text-gray-700 font-semibold mb-1">Estado del plan</label>
+        <label for="estadoPlan" class="block text-sm font-medium text-gray-700 mb-1">Estado del plan</label>
         <select id="estadoPlan"
           name="estadoPlan"
           [(ngModel)]="plan.estadoPlan"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
           <option value="PENDIENTE">Pendiente</option>
           <option value="ACTIVO">Activo</option>
           <option value="COMPLETADO">Completado</option>
@@ -50,65 +88,93 @@
 
       <!-- Días Disponibles por día de la semana -->
       <div class="mt-6">
-        <h3 class="text-lg font-bold text-gray-800 mb-4">Selecciona los días para tu plan</h3>
+        <h3 class="text-lg font-bold text-gray-800 mb-4">
+          Selecciona los días para el plan <span class="text-red-500">*</span>
+        </h3>
         
         <div *ngIf="cargandoDias" class="text-center py-4">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
           <p class="mt-2 text-gray-600">Cargando días disponibles...</p>
         </div>
 
-        <div *ngIf="!cargandoDias && diasDisponibles.length === 0" class="text-center py-4 text-gray-600">
-          No hay días disponibles. Crea algunos primero.
+        <div *ngIf="!cargandoDias && diasDisponibles.length === 0" class="text-center py-4 text-gray-600 bg-gray-50 rounded-lg border">
+          <p class="font-medium">No hay días disponibles</p>
+          <p class="text-sm">Crea algunos días primero para poder asignarlos al plan.</p>
+        </div>
+
+        <!-- Contador de días seleccionados -->
+        <div *ngIf="!cargandoDias && diasDisponibles.length > 0" class="mb-4 p-3 bg-gray-50 rounded-lg">
+          <span class="text-sm font-medium text-gray-700">
+            Días seleccionados: {{ diasSeleccionados.length }}
+          </span>
         </div>
 
         <!-- Agrupados por día de la semana -->
-        <div *ngFor="let diaSemana of diasSemana" class="mb-6">
-          <h4 class="font-semibold text-blue-800 mb-2">{{ diaSemana | lowercase | titlecase }}</h4>
+        <div *ngFor="let diaSemana of diasSemana" class="mb-4">
+          <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+            <span class="mr-2">{{ diaSemana }}</span>
+            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+              {{ getDiaDisponiblesParaDiaSemana(diaSemana).length }} disponible(s)
+            </span>
+          </h4>
           
-          <div *ngIf="getDiaDisponiblesParaDiaSemana(diaSemana).length === 0" class="text-gray-500 italic text-sm mb-3">
+          <div *ngIf="getDiaDisponiblesParaDiaSemana(diaSemana).length === 0" class="text-gray-500 italic text-sm mb-3 ml-4">
             No hay días disponibles para este día de la semana
           </div>
           
           <div class="space-y-2">
             <div *ngFor="let dia of getDiaDisponiblesParaDiaSemana(diaSemana)" 
-                 class="border rounded-lg p-3 flex items-center"
-                 [ngClass]="{'border-blue-500 bg-blue-50': isDiaSelected(dia.id_diaSemana?.toString() || ''), 'border-gray-200': !isDiaSelected(dia.id_diaSemana?.toString() || '')}"
+                 class="border rounded-lg p-3 cursor-pointer transition-all duration-200 hover:shadow-md"
+                 [ngClass]="isDiaSelected(dia.id_diaSemana?.toString() || '') ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'"
                  (click)="toggleDia(dia.id_diaSemana?.toString() || '')">
               
               <!-- Checkbox visual -->
-              <div class="flex-shrink-0 h-5 w-5 mr-2 border rounded flex items-center justify-center"
-                   [ngClass]="{'bg-blue-500 border-blue-500': isDiaSelected(dia.id_diaSemana?.toString() || ''), 'border-gray-300': !isDiaSelected(dia.id_diaSemana?.toString() || '')}">
-                <svg *ngIf="isDiaSelected(dia.id_diaSemana?.toString() || '')" xmlns="http://www.w3.org/2000/svg" 
-                     class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              
-              <!-- Información del día -->
-              <div class="flex-grow">
-                <div class="flex items-center justify-between">
-                  <span class="font-medium">{{ dia.fechaDia || 'Sin fecha' }}</span>
-                  <span class="text-sm px-2 py-1 rounded-full"
-                        [ngClass]="obtenerClaseEstado(dia.estadoDia || '')">
-                    {{ dia.estadoDia || 'Sin estado' }}
-                  </span>
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 h-5 w-5 mt-0.5 border rounded flex items-center justify-center transition-colors duration-200"
+                     [ngClass]="isDiaSelected(dia.id_diaSemana?.toString() || '') ? 'bg-blue-500 border-blue-500' : 'border-gray-300'">
+                  <svg *ngIf="isDiaSelected(dia.id_diaSemana?.toString() || '')" xmlns="http://www.w3.org/2000/svg" 
+                       class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
                 </div>
                 
-                <div class="grid grid-cols-3 gap-2 mt-2 text-sm text-gray-600">
-                  <div>
-                    <span class="font-medium">Calorías:</span> {{ dia.objetivoCaloriasDelDia || '0' }}
+                <!-- Información del día -->
+                <div class="flex-grow">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-medium text-gray-900">{{ dia.fechaDia || 'Sin fecha' }}</span>
+                    <span class="text-xs px-2 py-1 rounded-full font-medium"
+                          [ngClass]="obtenerClaseEstado(dia.estadoDia || '')">
+                      {{ dia.estadoDia || 'Sin estado' }}
+                    </span>
                   </div>
-                  <div>
-                    <span class="font-medium">Proteínas:</span> {{ dia.objetivoProteinasDelDia || '0' }}g
+                  
+                  <div class="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                    <div class="flex items-center">
+                      <span class="font-medium">Calorías:</span> 
+                      <span class="ml-1">{{ dia.objetivoCaloriasDelDia || '0' }}</span>
+                    </div>
+                    <div class="flex items-center">
+                      <span class="font-medium">Proteínas:</span> 
+                      <span class="ml-1">{{ dia.objetivoProteinasDelDia || '0' }}g</span>
+                    </div>
+                    <div class="flex items-center">
+                      <span class="font-medium">Comidas:</span> 
+                      <span class="ml-1">{{ dia.numeroComidasDia || '0' }}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span class="font-medium">Comidas:</span> {{ dia.numeroComidasDia || '0' }}
+                  
+                  <!-- Recomendaciones del día -->
+                  <div *ngIf="dia.recomendacionesDelDia" class="mt-2">
+                    <span class="text-xs font-medium text-gray-700">Recomendaciones:</span>
+                    <p class="text-xs text-gray-600 mt-1">{{ dia.recomendacionesDelDia }}</p>
                   </div>
-                </div>
-                
-                <!-- Recetas del día (opcional) -->
-                <div *ngIf="dia.receta && dia.receta.length > 0" class="mt-2">
-                  <span class="text-sm font-medium text-gray-700">{{ dia.receta.length }} recetas incluidas</span>
+                  
+                  <!-- Recetas del día -->
+                  <div *ngIf="dia.receta && dia.receta.length > 0" class="mt-2">
+                    <span class="text-xs font-medium text-green-700">
+                      {{ dia.receta.length }} receta(s) incluida(s)
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -117,16 +183,16 @@
       </div>
 
       <!-- Botones -->
-      <div class="flex justify-between mt-8">
+      <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
         <button type="button"
           (click)="cancelar()"
-          class="bg-gray-200 text-gray-800 py-2 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
+          class="bg-gray-200 text-gray-800 py-2 px-6 rounded-lg font-semibold hover:bg-gray-300 transition-colors duration-200">
           Cancelar
         </button>
         <button type="submit"
-          [disabled]="isSaving"
-          class="bg-blue-700 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50">
-          {{ isSaving ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear Plan') }}
+          [disabled]="isSaving || cargandoUsuarios || cargandoDias"
+          class="bg-blue-700 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ isSaving ? 'Guardando...' : (isEditing ? 'Actualizar Plan' : 'Crear Plan') }}
         </button>
       </div>
     </form>

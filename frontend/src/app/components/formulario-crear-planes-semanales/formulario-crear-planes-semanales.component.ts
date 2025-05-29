@@ -7,6 +7,9 @@ import { Router } from '@angular/router';
 import { PlanSemana } from '../../interface/plan-semana';
 import { DiaSemana } from '../../interface/dia-semana';
 import { DiaSemanaService } from '../../service/dia-semana.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-formulario-crear-planes-semanales',
@@ -15,7 +18,7 @@ import { DiaSemanaService } from '../../service/dia-semana.service';
   styleUrl: './formulario-crear-planes-semanales.component.scss'
 })
 export class FormularioCrearPlanesSemanalesComponent {
-// Modelo para el formulario
+  // Modelo para el formulario
   plan: PlanSemana = {
     id_PlanSemana: '',
     id_usuario: '',
@@ -29,6 +32,9 @@ export class FormularioCrearPlanesSemanalesComponent {
   diasDisponibles: DiaSemana[] = [];
   diasSeleccionados: string[] = []; // IDs de los días seleccionados
 
+  // Usuarios disponibles para seleccionar
+  usuariosDisponibles: any[] = [];
+
   // Días de la semana para selección
   diasSemana: string[] = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
   
@@ -38,23 +44,41 @@ export class FormularioCrearPlanesSemanalesComponent {
   errorMessage = '';
   successMessage = '';
   cargandoDias = false;
+  cargandoUsuarios = false;
+
+  // Usuario autenticado actual
+  usuarioAutenticado: any = null;
 
   constructor(
     private planSemanaService: PlanSemanaService,
     private diaSemanaService: DiaSemanaService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private auth: Auth
   ) {}
 
   async ngOnInit() {
-    // Obtener el ID del usuario actual
-    const currentUser = await this.authService.currentUser.getValue();
-    if (currentUser) {
-      this.plan.id_usuario = currentUser.uid;
-    } else {
-      this.errorMessage = 'Debes iniciar sesión para crear un plan semanal';
-    }
+    // Verificar autenticación
+    onAuthStateChanged(this.auth, async (user) => {
+      if (user) {
+        this.usuarioAutenticado = user;
+        console.log('Usuario autenticado:', user);
+        
+        // Cargar datos iniciales
+        await this.inicializarFormulario();
+      } else {
+        console.error('Usuario no autenticado');
+        this.errorMessage = 'Debes iniciar sesión para acceder al formulario';
+        this.router.navigate(['/login']);
+      }
+    });
+  }
 
+  async inicializarFormulario() {
+    // Cargar usuarios disponibles
+    await this.cargarUsuarios();
+    
     // Cargar los días disponibles
     await this.cargarDiasDisponibles();
 
@@ -77,6 +101,28 @@ export class FormularioCrearPlanesSemanalesComponent {
       
       this.plan.fechaInicio = hoy.toISOString().split('T')[0];
       this.plan.fechaFin = finPlan.toISOString().split('T')[0];
+    }
+  }
+
+  async cargarUsuarios() {
+    try {
+      this.cargandoUsuarios = true;
+      this.errorMessage = '';
+      
+      const token = await this.usuarioAutenticado.getIdToken();
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      
+      // Obtener todos los usuarios
+      this.usuariosDisponibles = await firstValueFrom(
+        this.http.get<any[]>('http://localhost:8080/api/admin/users/getAllUsers', { headers })
+      );
+      
+      console.log('Usuarios cargados:', this.usuariosDisponibles);
+      this.cargandoUsuarios = false;
+    } catch (error) {
+      this.cargandoUsuarios = false;
+      this.errorMessage = 'Error al cargar los usuarios: ' + (error as any).message;
+      console.error('Error al cargar usuarios:', error);
     }
   }
 
@@ -145,6 +191,12 @@ export class FormularioCrearPlanesSemanalesComponent {
     }
   }
 
+  // Obtener el nombre completo del usuario seleccionado
+  obtenerNombreUsuario(userId: string): string {
+    const usuario = this.usuariosDisponibles.find(u => u.id_usuario === userId);
+    return usuario ? `${usuario.nombreCompleto} (${usuario.email})` : 'Usuario no encontrado';
+  }
+
   async guardarPlan() {
     // Validar el formulario
     if (!this.validarFormulario()) {
@@ -184,7 +236,7 @@ export class FormularioCrearPlanesSemanalesComponent {
 
   validarFormulario(): boolean {
     if (!this.plan.id_usuario) {
-      this.errorMessage = 'Debes iniciar sesión para crear un plan';
+      this.errorMessage = 'Debes seleccionar un usuario para asignar el plan';
       return false;
     }
 
@@ -210,12 +262,9 @@ export class FormularioCrearPlanesSemanalesComponent {
   }
 
   resetearFormulario() {
-    // Mantener el ID de usuario pero resetear el resto del formulario
-    const userId = this.plan.id_usuario;
-    
     this.plan = {
       id_PlanSemana: this.planSemanaService.generateUniqueId(),
-      id_usuario: userId,
+      id_usuario: '',
       diasSemana: [],
       fechaInicio: '',
       fechaFin: '',

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, UserCredential } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, User, UserCredential } from '@angular/fire/auth';
 import { collection, doc, Firestore, getDoc, getDocs, setDoc } from '@angular/fire/firestore';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,11 @@ export class AuthService {
   public currentUser = new BehaviorSubject<any>(null);
   public chats: any[] = [];
 
-  constructor(private auth: Auth, private firestore: Firestore) {
+  constructor(
+    private auth: Auth,
+    private firestore: Firestore,
+    private http: HttpClient
+  ) {
     // Observador para mantener la información del usuario actualizada
     this.auth.onAuthStateChanged(user => {
       if (user) {
@@ -22,7 +27,7 @@ export class AuthService {
         this.stopTokenRefreshTimer();
       }
     });
-   }
+  }
 
   async loginWithEmailAndPassword(email: string, password: string): Promise<UserCredential | null> {
     try {
@@ -114,10 +119,6 @@ export class AuthService {
     return users;
   }
 
-  async getCurrentUser() {
-    return this.currentUser.value;
-  }
-
   async getChats() {
     fetch('http://localhost:8080/listarChats')
       .then(response => response.json())
@@ -142,4 +143,61 @@ export class AuthService {
         console.error('Error creating chat:', error);
       });
   }
+
+  async getUserRole(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    if (!user) return null;
+
+    try {
+      const token = await user.getIdToken();
+      const response = await this.http.get<{ role: string }>(
+        'http://localhost:8080/api/users/comprobarRol',
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      ).toPromise();
+      return response?.role || null;
+    } catch (error) {
+      console.error('Error al obtener el rol del usuario desde el backend:', error);
+      return null;
+    }
+  }
+
+  async getUserProfileFromBackend(): Promise<any> {
+  const user = this.auth.currentUser;
+  if (!user) return null;
+
+  try {
+    const token = await user.getIdToken();
+    // Si tu backend requiere el UID en la URL:
+    const uid = user.uid;
+    const response = await this.http.get<any>(
+      `http://localhost:8080/api/users/profile/${uid}`,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    ).toPromise();
+    return response;
+  } catch (error) {
+    console.error('Error al obtener el perfil del usuario desde el backend:', error);
+    return null;
+  }
+}
+
+// Método para obtener el usuario actual - retorna una promesa
+async getCurrentUser(): Promise<User | null> {
+  // Primero intenta obtener el usuario actual
+  const currentUser = this.auth.currentUser;
+  if (currentUser) {
+    return currentUser;
+  }
+
+  // Si no hay usuario actual, espera a que el estado de autenticación se resuelva
+  return new Promise<User | null>((resolve) => {
+    const unsubscribe = this.auth.onAuthStateChanged((user) => {
+      unsubscribe();
+      resolve(user);
+    });
+  });
+}
 }

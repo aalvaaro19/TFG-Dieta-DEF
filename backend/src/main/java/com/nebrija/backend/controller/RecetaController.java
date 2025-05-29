@@ -22,6 +22,17 @@ public class RecetaController {
     @Autowired
     private RecetaService recetaService;
 
+    @GetMapping("/getAllRecetas")
+    public ResponseEntity<List<Receta>> getAllRecetasUser() {
+        try {
+            List<Receta> recetas = recetaService.getDataRecetas("recetas");
+            return ResponseEntity.ok(recetas);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Error al obtener todas las recetas: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/admin/recetas/getAllRecetas")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Receta>> getAllRecetas() {

@@ -33,13 +33,16 @@ export class ListarProgresoComponent implements OnInit {
 
   async getCurrentUser() {
     try {
+      console.log('Obteniendo usuario actual...');
       const user = await this.authService.getCurrentUser();
       console.log('Current user:', user);
-      
+
       if (user) {
         this.userId = user.uid;
+        console.log('User ID obtenido:', this.userId);
         this.loadProgresos();
       } else {
+        console.log('No hay usuario autenticado');
         this.loading = false;
         this.error = 'Debes iniciar sesión para ver los registros de progreso';
       }
@@ -50,34 +53,34 @@ export class ListarProgresoComponent implements OnInit {
     }
   }
 
-  loadProgresos() {
-    if (!this.userId) {
-      this.loading = false;
-      this.error = 'Error de autenticación. Inicia sesión nuevamente.';
-      return;
-    }
-
-    console.log('Loading progress for user:', this.userId);
-
-    this.progresoService.getProgresosByUserId(this.userId).subscribe({
-      next: (data) => {
-        console.log('Progress data received:', data);
-        this.progresos = this.sortProgresosByDate(data);
-        
-        this.loadUsersInfo();
-        console.log('Progresos sorted by date:', this.progresos);
-        
+  async loadProgresos() {
+    this.loading = true;
+    this.error = '';
+    try {
+      const token = await this.authService.getIdToken();
+      if (!token) {
         this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error loading progress records:', err);
-        this.loading = false;
-        this.error = 'Error al cargar los registros de progreso: ' + (err.message || 'Intenta nuevamente');
-      },
-      complete: () => {
-        this.loading = false;
+        this.error = 'No se pudo obtener el token de autenticación';
+        return;
       }
-    });
+
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      this.http.get<Progreso[]>('http://localhost:8080/api/progresos/admin/all', { headers })
+        .subscribe({
+          next: (data) => {
+            this.progresos = this.sortProgresosByDate(data || []);
+            this.loadUsersInfo();
+            this.loading = false;
+          },
+          error: (err) => {
+            this.loading = false;
+            this.error = 'Error al cargar los registros de progreso: ' + (err.message || 'Intenta nuevamente');
+          }
+        });
+    } catch (err) {
+      this.loading = false;
+      this.error = 'Error al cargar los registros de progreso';
+    }
   }
 
   async loadUsersInfo() {
@@ -155,10 +158,16 @@ export class ListarProgresoComponent implements OnInit {
 
   // Métodos modificados para manejar valores string
   getProgresoAnterior(index: number): Progreso | null {
-    if (index <= 0 || index >= this.progresos.length) {
-      return null;
+    const progresoActual = this.progresos[index];
+    if (!progresoActual) return null;
+
+    // Busca el progreso anterior del mismo usuario
+    for (let i = index - 1; i >= 0; i--) {
+      if (this.progresos[i].id_usuario === progresoActual.id_usuario) {
+        return this.progresos[i];
+      }
     }
-    return this.progresos[index - 1];
+    return null;
   }
 
   // Convierte strings a números antes de calcular la diferencia

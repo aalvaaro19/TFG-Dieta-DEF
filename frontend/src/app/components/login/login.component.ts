@@ -21,10 +21,17 @@ export class LoginComponent {
     try {
       const user = await this.authService.loginWithEmailAndPassword(email, password);
       if (user) {
-        // Asegurar que tenemos un token fresco antes de navegar
         await this.authService.getIdToken();
-        console.log('Usuario autenticado:', user);
-        this.router.navigate(['/listarUsuarios']);
+        // Obtener el rol del usuario usando el AuthService
+        const role = await this.authService.getUserRole();
+        if (role === 'ADMIN') {
+          this.router.navigate(['/homeTrainer']);
+        } else if (role === 'USER') {
+          this.router.navigate(['/homeUsers']);
+        } else {
+          // Redirección por defecto o manejo de error
+          this.router.navigate(['/']);
+        }
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
@@ -34,8 +41,17 @@ export class LoginComponent {
   async loginWithGoogle() {
     try {
       const user = await this.authService.loginWithGoogle();
-      console.log('Usuario autenticado con Google:', user);
-      this.router.navigate(['/listarUsuarios']);
+      if (user) {
+        // Obtener el rol del usuario usando el AuthService
+        const role = await this.authService.getUserRole();
+        if (role === 'ADMIN') {
+          this.router.navigate(['/homeTrainers']);
+        } else if (role === 'USER') {
+          this.router.navigate(['/homeUsers']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      }
     } catch (error) {
       console.error('Error al iniciar sesión con Google:', error);
     }

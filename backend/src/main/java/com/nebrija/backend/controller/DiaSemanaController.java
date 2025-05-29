@@ -22,6 +22,17 @@ public class DiaSemanaController {
     @Autowired
     private DiaSemanaService diaSemanaService;
 
+    @GetMapping("/getAllDias")
+    public ResponseEntity<List<DiaSemana>> getAllDiasUser() {
+        try {
+            List<DiaSemana> dias = diaSemanaService.getAllDiasSemana();
+            return ResponseEntity.ok(dias);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Error al obtener los días de la semana: ", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/admin/dias-semana/getAllDias")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<DiaSemana>> getAllDias() {

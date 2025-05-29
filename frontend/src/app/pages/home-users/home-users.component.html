@@ -1,0 +1,60 @@
+<div class="flex h-screen">
+  <aside class="w-1/5 p-5 text-white flex flex-col items-center" style="background-color: #171822;">
+      <img src="images/LOGO-VITALSHAPE-LOGIN_Y_REGISTRO.jpeg" alt="VitalShape Logo" class="mb-8 w-40 h-40 object-contain rounded-full shadow-lg" />
+    <button class="w-full py-3 font-semibold rounded-lg mb-4"
+      [ngClass]="{
+        'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'perfil',
+        'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'perfil'
+      }"
+      (click)="goToPerfil()"
+    >
+      Perfil
+    </button>
+
+    <button class="w-full py-3 font-semibold rounded-lg mb-4"
+      [ngClass]="{
+        'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'listadoPlanesSemanales',
+        'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'listadoPlanesSemanales'
+      }"
+      (click)="goToPlanesSemanales()"
+    >
+      Planes semanales
+    </button>
+
+    <button class="w-full py-3 font-semibold rounded-lg mb-4"
+      [ngClass]="{
+        'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'listadoProgresos',
+        'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'listadoProgresos'
+      }"
+      (click)="goToProgresos()"
+    >
+      Mis progresos
+    </button>
+
+    <button class="w-full py-3 font-semibold rounded-lg mt-auto"
+      style="background-color: #F1EBDF; color: #171822;"
+      (click)="toggleAuth()"
+    >
+      {{ isLoggedIn ? 'Cerrar Sesión' : 'Login' }}
+    </button>
+      <p class="text-sm mt-5">Interfaz registrada por VitalShape</p>
+  </aside>
+  <main class="flex-1 p-10 overflow-y-auto">
+    <ng-container *ngIf="activeComponent === 'perfil'">
+      <app-perfil></app-perfil>
+    </ng-container>
+
+    <ng-container *ngIf="activeComponent === 'listadoPlanesSemanales'">
+      <app-listado-planes-semanales></app-listado-planes-semanales>
+    </ng-container>
+
+    <ng-container *ngIf="activeComponent === 'listadoProgresos'">
+      <app-listado-progresos></app-listado-progresos>
+            <button class="w-full mt-5 py-3 bg-blue-700 text-black text-lg rounded-lg"
+        style="background-color: #F1EBDF;"
+        (click)="handleRegisterButton()">
+        Registrar nuevo progreso
+      </button>
+    </ng-container>
+  </main>
+</div>

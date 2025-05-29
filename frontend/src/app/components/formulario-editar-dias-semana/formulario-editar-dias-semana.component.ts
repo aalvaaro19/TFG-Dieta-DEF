@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { Location } from '@angular/common';
 import { DiaSemana, DiasSemana } from '../../interface/dia-semana';
 import { Receta } from '../../interface/receta';
 import { DiaSemanaService } from '../../service/dia-semana.service';
@@ -52,7 +53,8 @@ export class FormularioEditarDiasSemanaComponent implements OnInit {
     private diaSemanaService: DiaSemanaService,
     private recetaService: RecetaService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {}
 
   async ngOnInit() {
@@ -146,7 +148,7 @@ export class FormularioEditarDiasSemanaComponent implements OnInit {
         
         if (resultado) {
           this.mensajeExito = 'Día actualizado correctamente';
-          setTimeout(() => this.router.navigate(['/dias-semana-lista']), 1500);
+          setTimeout(() => this.location.back(), 1000);
         } else {
           this.mensajeError = 'Error al actualizar el día';
         }
@@ -156,7 +158,7 @@ export class FormularioEditarDiasSemanaComponent implements OnInit {
         
         if (resultado) {
           this.mensajeExito = `Día creado correctamente con ID: ${resultado}`;
-          setTimeout(() => this.router.navigate(['/dias-semana-lista']), 1500);
+          setTimeout(() => this.location.back(), 1000);
         } else {
           this.mensajeError = 'Error al crear el día';
         }

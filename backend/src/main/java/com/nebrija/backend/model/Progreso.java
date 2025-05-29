@@ -46,15 +46,27 @@ public class Progreso {
         progreso.setId_progreso((String) map.get("id_progreso"));
         progreso.setId_usuario((String) map.get("id_usuario"));
         progreso.setFecha((String) map.get("fecha"));
-        progreso.setPeso((Double) map.get("peso"));
-        progreso.setMasaGrasa((Double) map.get("masaGrasa"));
-        progreso.setMasaMuscular((Double) map.get("masaMuscular"));
-        progreso.setPecho((Double) map.get("pecho"));
-        progreso.setAbdomen((Double) map.get("abdomen"));
-        progreso.setCadera((Double) map.get("cadera"));
-        progreso.setCintura((Double) map.get("cintura"));
-        progreso.setBrazoDerecho((Double) map.get("brazoDerecho"));
-        progreso.setPiernaDerecha((Double) map.get("piernaDerecha"));
+        progreso.setPeso(toDouble(map.get("peso")));
+        progreso.setMasaGrasa(toDouble(map.get("masaGrasa")));
+        progreso.setMasaMuscular(toDouble(map.get("masaMuscular")));
+        progreso.setPecho(toDouble(map.get("pecho")));
+        progreso.setAbdomen(toDouble(map.get("abdomen")));
+        progreso.setCadera(toDouble(map.get("cadera")));
+        progreso.setCintura(toDouble(map.get("cintura")));
+        progreso.setBrazoDerecho(toDouble(map.get("brazoDerecho")));
+        progreso.setPiernaDerecha(toDouble(map.get("piernaDerecha")));
         return progreso;
+    }
+
+    private static double toDouble(Object value) {
+        if (value == null) return 0.0;
+        if (value instanceof Double) return (Double) value;
+        if (value instanceof Integer) return ((Integer) value).doubleValue();
+        if (value instanceof Long) return ((Long) value).doubleValue();
+        if (value instanceof Float) return ((Float) value).doubleValue();
+        if (value instanceof String) {
+            try { return Double.parseDouble((String) value); } catch (Exception e) { return 0.0; }
+        }
+        return 0.0;
     }
 }//Cierre de la clase Progreso

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProgresoService } from '../../service/progreso.service';
 import { AuthService } from '../../service/auth.service';
@@ -23,7 +23,8 @@ export class FormularioProgresoComponent implements OnInit {
     private formBuilder: FormBuilder,
     private progresoService: ProgresoService,
     private authService: AuthService,
-    private router: Router
+    private router: Router, 
+    private location: Location
   ) {
     this.progresoForm = this.formBuilder.group({
       fecha: [new Date().toISOString().split('T')[0], Validators.required],
@@ -95,7 +96,7 @@ export class FormularioProgresoComponent implements OnInit {
         
         // Redirigir después de un breve tiempo
         setTimeout(() => {
-          this.router.navigate(['/mis-progresos']);
+          this.location.back();
         }, 2000);
       },
       error: (err) => {

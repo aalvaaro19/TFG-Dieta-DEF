@@ -15,11 +15,10 @@ import { PaginaChatIndividualComponent } from "../../pages/pagina-chat-individua
 import { DiaSemanaFormularioComponent } from "../dia-semana-formulario/dia-semana-formulario.component";
 import { ListarDiasSemanaComponent } from "../listar-dias-semana/listar-dias-semana.component";
 import { FormularioCrearPlanesSemanalesComponent } from "../formulario-crear-planes-semanales/formulario-crear-planes-semanales.component";
-import { ListarPlanesSemanalesComponent } from "../listar-planes-semanales/listar-planes-semanales.component";
 
 @Component({
   selector: 'app-listar-usuarios',
-  imports: [CommonModule, CartaPersonalComponent, FormularioRecetasComponent, PaginaRecetasComponent, FormularioProgresoComponent, ListarProgresoComponent, PaginaChatComponent, PaginaChatIndividualComponent, DiaSemanaFormularioComponent, ListarDiasSemanaComponent, FormularioCrearPlanesSemanalesComponent, ListarPlanesSemanalesComponent],
+  imports: [CommonModule, CartaPersonalComponent, FormularioRecetasComponent, PaginaRecetasComponent, FormularioProgresoComponent, ListarProgresoComponent, PaginaChatComponent, PaginaChatIndividualComponent, DiaSemanaFormularioComponent, ListarDiasSemanaComponent, FormularioCrearPlanesSemanalesComponent],
   templateUrl: './listar-usuarios.component.html',
   styleUrl: './listar-usuarios.component.scss'
 })

@@ -3,14 +3,16 @@ package com.nebrija.backend.controller;
 import com.nebrija.backend.model.enums.Role;
 import com.nebrija.backend.model.User;
 import com.nebrija.backend.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -65,8 +67,52 @@ public class UserController {
     }
 
     @DeleteMapping("/users/delete/{uid}")
-    public void deleteUser(@PathVariable String uid, @AuthenticationPrincipal String token) throws Exception {
-        userService.deleteUser(uid, token);
+    public ResponseEntity<?> deleteUser(@PathVariable String uid, HttpServletRequest request) {
+        try {
+            // Obtener el token del header Authorization
+            String authHeader = request.getHeader("Authorization");
+
+            // Validar que el header exista y tenga el formato correcto
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Token de autorización requerido"));
+            }
+
+            // Extraer el token sin el prefijo "Bearer "
+            String token = authHeader.substring(7);
+
+            // Log para debug (opcional)
+            System.out.println("🔍 Eliminando usuario con UID: " + uid);
+            System.out.println("🔍 Token recibido: " + token.substring(0, Math.min(20, token.length())) + "...");
+
+            // Llamar al servicio para eliminar el usuario
+            userService.deleteUser(uid, token);
+
+            // Respuesta exitosa
+            return ResponseEntity.ok(Map.of(
+                    "message", "Usuario eliminado exitosamente",
+                    "uid", uid
+            ));
+
+        } catch (IllegalArgumentException e) {
+            // Error de validación (ej: usuario no encontrado, no se puede eliminar a sí mismo)
+            System.err.println("❌ Error de validación: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+
+        } catch (SecurityException e) {
+            // Error de permisos
+            System.err.println("❌ Error de permisos: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "No tienes permisos para realizar esta acción"));
+
+        } catch (Exception e) {
+            // Error general
+            System.err.println("❌ Error al eliminar usuario: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno del servidor: " + e.getMessage()));
+        }
     }
 
     // Endpoints solo para administradores
@@ -108,7 +154,7 @@ public class UserController {
     }
 
     @GetMapping("/users/comprobarRol")
-    public ResponseEntity<Role> verifyUserRole(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<Map<String, Role>> verifyUserRole(@RequestHeader("Authorization") String token) {
         try {
             // Extraer el token sin "Bearer "
             String idToken = token.replace("Bearer ", "");
@@ -118,7 +164,7 @@ public class UserController {
             Role role = userService.verifyUserRole(idToken);
             System.out.println("Rol del usuario: " + role);
 
-            return ResponseEntity.ok(role);
+            return ResponseEntity.ok(Collections.singletonMap("role", role));
         } catch (Exception e) {
             e.printStackTrace(); // Mostrar el error completo
             return ResponseEntity.status(401).build();

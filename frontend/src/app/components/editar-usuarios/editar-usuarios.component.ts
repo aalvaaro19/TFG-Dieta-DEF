@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -22,6 +22,7 @@ export class EditarUsuariosComponent implements OnInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -94,7 +95,7 @@ export class EditarUsuariosComponent implements OnInit {
       ));
       
       console.log('Usuario actualizado');
-      this.router.navigate(['/listarUsuarios']);
+      this.location.back(); // Regresa a la página anterior
     } catch (error) {
       console.error('Error al actualizar el usuario:', error);
     }

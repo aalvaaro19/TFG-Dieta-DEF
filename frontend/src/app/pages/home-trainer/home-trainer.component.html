@@ -1,0 +1,96 @@
+<div class="flex h-screen">
+  <aside class="w-1/5 p-5 text-white flex flex-col items-center" style="background-color: #171822;">
+    <img src="images/LOGO-VITALSHAPE-LOGIN_Y_REGISTRO.jpeg" alt="VitalShape Logo" class="mb-8 w-40 h-40 object-contain rounded-full shadow-lg" />
+  <button class="w-full py-3 font-semibold rounded-lg mb-4"
+    [ngClass]="{
+      'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'clientes',
+      'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'clientes'
+    }"
+    (click)="goToClientes()"
+  >
+    Clientes
+  </button>
+
+  <button class="w-full py-3 font-semibold rounded-lg mb-4"
+    [ngClass]="{
+      'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'recetas',
+      'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'recetas'
+    }"
+    (click)="goToRecetas()"
+  >
+    Recetas
+  </button>
+
+  <button class="w-full py-3 font-semibold rounded-lg mb-4"
+    [ngClass]="{
+      'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'planesDiarios',
+      'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'planesDiarios'
+    }"
+    (click)="goToPlanesDiarios()"
+  >
+    Planes diarios
+  </button>
+
+  <button class="w-full py-3 font-semibold rounded-lg mb-4"
+    [ngClass]="{
+      'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'planesSemanales',
+      'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'planesSemanales'
+    }"
+    (click)="goToPlanesSemanales()"
+  >
+    Planes semanales
+  </button>
+
+  <button class="w-full py-3 font-semibold rounded-lg mb-4"
+    [ngClass]="{
+      'bg-yellow-300 text-black ring-2 ring-yellow-500': activeComponent === 'progresos',
+      'bg-[#F1EBDF] text-[#171822]': activeComponent !== 'progresos'
+    }"
+    (click)="goToProgresos()"
+  >
+    Progresos de los clientes
+  </button>
+
+  <button class="w-full py-3 font-semibold rounded-lg mt-auto"
+    style="background-color: #F1EBDF; color: #171822;"
+    (click)="toggleAuth()"
+  >
+    Cerrar Sesión
+  </button>
+    <p class="text-sm mt-5">Interfaz registrada por VitalShape</p>
+  </aside>
+<main class="flex-1 p-10 overflow-y-auto">
+  <ng-container *ngIf="activeComponent === 'clientes'">
+    <app-carta-personal></app-carta-personal>
+  </ng-container>
+
+  <ng-container *ngIf="activeComponent === 'recetas'">
+    <app-pagina-recetas></app-pagina-recetas>
+  </ng-container>
+
+  <ng-container *ngIf="activeComponent === 'planesSemanales'">
+    <app-listar-planes-semanales></app-listar-planes-semanales>
+  </ng-container>
+
+  <ng-container *ngIf="activeComponent === 'planesDiarios'">
+    <app-listar-dias-semana></app-listar-dias-semana>
+  </ng-container>
+
+  <ng-container *ngIf="activeComponent === 'progresos'">
+    <app-listar-progreso></app-listar-progreso>
+  </ng-container>
+
+  <button class="w-full mt-5 py-3 bg-blue-700 text-black text-lg rounded-lg"
+    style="background-color: #F1EBDF;"
+    (click)="handleRegisterButton()">
+    {{
+      activeComponent === 'clientes' ? 'Registrar nuevo cliente' :
+      activeComponent === 'recetas' ? 'Registrar nueva receta' :
+      activeComponent === 'planesDiarios' ? 'Registrar nuevo plan diario' :
+      activeComponent === 'planesSemanales' ? 'Registrar nuevo plan semanal' :
+      activeComponent === 'progresos' ? 'Registrar nuevo progreso' :
+      'Registrar'
+    }}
+  </button>
+</main>
+</div>
