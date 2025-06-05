@@ -45,3 +45,6 @@ Thumbs.db
 .firebase
 *-debug.log
 .runtimeconfig.json
+
+# Ignorar claves privadas de Firebase
+src/main/resources/*.json
